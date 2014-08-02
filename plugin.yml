@@ -1,0 +1,17 @@
+name: ManCo
+version: ${project.version}
+description: ManCo supply crates
+author: xize
+authors: [] 
+website:
+loadbefore: [LWC]
+
+main: tv.mineinthebox.manco.ManCo
+database: false
+depend: []
+softdepend: [Worldguard, Worldedit, Vault, CoreProtect, Prism, LogBlock, NoCheatPlus]
+
+commands:
+  manco:
+     description: manco main command
+     aliases: []
