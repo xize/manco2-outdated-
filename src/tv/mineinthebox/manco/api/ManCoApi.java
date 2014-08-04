@@ -70,9 +70,9 @@ public class ManCoApi {
 	 * @return returns true if the crate is spawned, else false a player can only have one crate per time.
 	 */
 	@SuppressWarnings("deprecation")
-	public boolean spawnCrate(CratePlayer p, NormalCrate crate) {
+	public NormalCrate spawnCrate(CratePlayer p, NormalCrate crate) {
 		if(p.hasCrate()) {
-			return false;
+			return crate;
 		}
 		Random rand = new Random();
 		if(p.getPlayer().getLocation().getY() < 63) {
@@ -96,7 +96,7 @@ public class ManCoApi {
 					fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getPlayer().getName()));
 					ManCo.getPlugin().getCrateOwners().add(p.getPlayer().getName());
 				}
-				return true;
+				return crate;
 			}
 		} else {
 			Location highest = p.getPlayer().getWorld().getHighestBlockAt(p.getPlayer().getLocation()).getLocation();
@@ -120,10 +120,10 @@ public class ManCoApi {
 					fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getPlayer().getName()));
 					ManCo.getPlugin().getCrateOwners().add(p.getPlayer().getName());	
 				}
-				return true;
+				return crate;
 			}
 		}
-		return false;
+		return crate;
 	}
 
 	/**
@@ -134,9 +134,9 @@ public class ManCoApi {
 	 * @return Boolean - when true the crate is spawned otherwise false.
 	 */
 	@SuppressWarnings("deprecation")
-	public boolean spawnCrate(CratePlayer p, NormalCrate crate, Location loc) {
+	public NormalCrate spawnCrate(CratePlayer p, NormalCrate crate, Location loc) {
 		if(p.hasCrate()) {
-			return false;
+			return crate;
 		}
 		if(ManCo.getPlugin().canFall(loc)) {
 			if(ManCo.getConfiguration().isCrateMessagesEnabled()) {
@@ -152,7 +152,7 @@ public class ManCoApi {
 				fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getPlayer().getName()));
 				ManCo.getPlugin().getCrateOwners().add(p.getPlayer().getName());
 		}
-		return false;
+		return crate;
 	}
 
 	/**
@@ -316,5 +316,9 @@ public class ManCoApi {
 	 */
 	public boolean isCrate(String name) {
 		return ManCo.getPlugin().isCrate(name);
+	}
+	
+	public NormalCrate[] getCrates() {
+		return ManCo.getPlugin().getCrates();
 	}
 }
