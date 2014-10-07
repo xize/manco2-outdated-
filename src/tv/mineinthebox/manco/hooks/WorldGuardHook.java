@@ -24,6 +24,7 @@ public class WorldGuardHook {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public boolean isInRegion(Player p) {
 		if(!(wg instanceof WorldGuardPlugin)) {
 			wg = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");

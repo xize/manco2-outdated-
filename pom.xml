@@ -73,8 +73,8 @@
 			<url>http://repo.bukkit.org/content/groups/public/</url>
 		</repository>
 		<repository>
-			<id>jnbt</id>
-			<url>http://maven.angry.com.au/release/</url>
+		<id>mitb-repo</id>
+		<url>http://ci.mineinthebox.tv:8080/plugin/repository/everything/</url>
 		</repository>
 		<repository>
 			<id>sk89q-repo</id>
@@ -141,9 +141,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>jnbt</groupId>
-			<artifactId>jnbt</artifactId>
-			<version>1.1</version>
+			<groupId>org.jnbt</groupId>
+			<artifactId>jNBT</artifactId>
+			<version>1.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

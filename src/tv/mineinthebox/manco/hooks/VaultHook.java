@@ -15,6 +15,7 @@ public class VaultHook {
 	 * @param s - the player
 	 * @param money - amount
 	 */
+	@SuppressWarnings("deprecation")
 	public void deposit(String s, double money) {
 		if(!(econ instanceof Economy)) {
 			RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
@@ -29,6 +30,7 @@ public class VaultHook {
 	 * @param s - the player
 	 * @param money - amount
 	 */
+	@SuppressWarnings("deprecation")
 	public void withdraw(String s, double money) {
 		if(!(econ instanceof Economy)) {
 			RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
@@ -43,6 +45,7 @@ public class VaultHook {
 	 * @param money - money
 	 * @return Boolean
 	 */
+	@SuppressWarnings("deprecation")
 	public boolean hasEnough(String p, double money) {
 		if(!(econ instanceof Economy)) {
 			RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
