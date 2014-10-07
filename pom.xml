@@ -39,7 +39,7 @@
 							<artifactSet>
 								<includes>
 									<include>org.mcstats.bukkit:metrics-lite:jar:</include>
-									<include>jnbt:jnbt:jar:</include>
+									<include>org.jnbt:jNBT:jar:*</include>
 								</includes>
 							</artifactSet>
 							<relocations>
