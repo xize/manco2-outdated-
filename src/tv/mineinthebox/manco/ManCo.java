@@ -19,7 +19,6 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.mcstats.MetricsLite;
 
 import tv.mineinthebox.manco.api.ManCoApi;
 import tv.mineinthebox.manco.enums.CrateType;
@@ -66,13 +65,6 @@ public class ManCo extends JavaPlugin {
 		}
 		
 		loadRecipes();
-		
-		try {
-			MetricsLite m = new MetricsLite(this);
-			m.start();
-		} catch(Exception e) {
-
-		}
 	}
 
 	public void onDisable() {
