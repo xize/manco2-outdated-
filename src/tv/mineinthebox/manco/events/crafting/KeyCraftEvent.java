@@ -11,6 +11,12 @@ import tv.mineinthebox.manco.enums.CrateType;
 import tv.mineinthebox.manco.instances.NormalCrate;
 
 public class KeyCraftEvent implements Listener {
+	
+	private final ManCo pl;
+	
+	public KeyCraftEvent(ManCo pl) {
+		this.pl = pl;
+	}
 
 	@EventHandler
 	public void onPrepare(PrepareItemCraftEvent e) {
@@ -21,8 +27,8 @@ public class KeyCraftEvent implements Listener {
 					if(inv.getItem(5) != null) {
 						if(inv.getItem(5).hasItemMeta()) {
 							if(inv.getItem(5).getItemMeta().hasDisplayName()) {
-								if(ManCo.getPlugin().isCrate(inv.getItem(5).getItemMeta().getDisplayName())) {
-									NormalCrate crate = ManCo.getPlugin().getCrate(inv.getItem(5).getItemMeta().getDisplayName());
+								if(pl.isCrate(inv.getItem(5).getItemMeta().getDisplayName())) {
+									NormalCrate crate = pl.getCrate(inv.getItem(5).getItemMeta().getDisplayName());
 									if(crate.needsKey()) {
 										if(inv.getItem(5).getType() == (crate.getType() == CrateType.NORMAL ? Material.GOLD_INGOT : Material.DIAMOND)) {
 											inv.setResult(crate.getKeyItem());

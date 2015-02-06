@@ -23,6 +23,12 @@ import tv.mineinthebox.manco.instances.NormalCrate;
 
 public class BlockFallEvent implements Listener {
 	
+	private final ManCo pl;
+	
+	public BlockFallEvent(ManCo pl) {
+		this.pl = pl;
+	}
+	
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onCall(EntityChangeBlockEvent e) {
@@ -34,7 +40,7 @@ public class BlockFallEvent implements Listener {
 				String player = (String)((FixedMetadataValue)fall.getMetadata("crate_owner").get(0)).asString();
 				String serie = (String)((FixedMetadataValue)fall.getMetadata("crate_serie").get(0)).asString();
 				
-				if(!ManCo.getScheduler().canFall(fall.getLocation())) {
+				if(!pl.getScheduler().canFall(fall.getLocation())) {
 					e.setCancelled(true);
 					return;
 				}
@@ -45,10 +51,10 @@ public class BlockFallEvent implements Listener {
 					Block block = fall.getLocation().getBlock();
 					block.setType(Material.CHEST);
 					Chest chest = (Chest) block.getState();
-					chest.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), player));
-					chest.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), serie));
+					chest.setMetadata("crate_owner", new FixedMetadataValue(pl, player));
+					chest.setMetadata("crate_serie", new FixedMetadataValue(pl, serie));
 					
-					NormalCrate ncrate = new NormalCrate(serie);
+					NormalCrate ncrate = new NormalCrate(serie, pl);
 					
 					List<ItemStack> items = new ArrayList<ItemStack>();
 					Iterator<ItemStack> it = ncrate.getRandomItems().iterator();
@@ -62,9 +68,9 @@ public class BlockFallEvent implements Listener {
 						chest.getInventory().addItem(items.get(0));
 					}
 					
-					p.setMetadata("crate", new FixedMetadataValue(ManCo.getPlugin(), chest));
+					p.setMetadata("crate", new FixedMetadataValue(pl, chest));
 					
-					Bukkit.getPluginManager().callEvent(new CrateFallEvent(ManCo.getApi().getCratePlayer(player), chest, ncrate));
+					Bukkit.getPluginManager().callEvent(new CrateFallEvent(pl.getApi().getCratePlayer(player), chest, ncrate));
 					e.setCancelled(true);
 				} else {
 					e.setCancelled(true);

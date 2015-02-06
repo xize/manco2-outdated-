@@ -9,10 +9,16 @@ import tv.mineinthebox.manco.instances.CratePlayer;
 
 public class PlayerOnJoinEvent implements Listener {
 	
+	private final ManCo pl;
+	
+	public PlayerOnJoinEvent(ManCo pl) {
+		this.pl = pl;
+	}
+	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
-		CratePlayer p = new CratePlayer(e.getPlayer());
-		ManCo.getPlugin().addPlayer(p);
+		CratePlayer p = new CratePlayer(e.getPlayer(), pl);
+		pl.addPlayer(p);
 	}
 
 }

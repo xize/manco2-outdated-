@@ -29,22 +29,22 @@ import tv.mineinthebox.manco.hooks.HookAble;
 import tv.mineinthebox.manco.instances.ChestSchedule;
 import tv.mineinthebox.manco.instances.CratePlayer;
 import tv.mineinthebox.manco.instances.NormalCrate;
+import tv.mineinthebox.manco.utils.SchematicUtils;
 
 public class ManCo extends JavaPlugin {
 
-	private static ManCo manco;
 	private Configuration config;
 	private ChestSchedule scheduler;
 	private Handler handler;
 	private ManCoApi api;
 	private HashSet<String> crateOwners;
-	private static Hook hooks;
-	private static HookAble hookss;
+	private Hook hooks;
+	private HookAble hookss;
+	private SchematicUtils schematic;
 
-	private HashMap<String, CratePlayer> players = new HashMap<String, CratePlayer>();
+	private final HashMap<String, CratePlayer> players = new HashMap<String, CratePlayer>();
 
 	public void onEnable() {
-		manco = this;
 		log(LogType.INFO, "has been enabled!");
 
 		config = new Configuration(this);
@@ -53,14 +53,14 @@ public class ManCo extends JavaPlugin {
 		handler = new Handler(this);
 		handler.start();
 
-		scheduler = new ChestSchedule();
+		scheduler = new ChestSchedule(this);
 
-		getCommand("manco").setExecutor(new command());
+		getCommand("manco").setExecutor(new MancoCommand(this));
 		
-		this.api = new ManCoApi();
+		this.api = new ManCoApi(this);
 		
 		for(Player p : ManCo.getOnlinePlayers()) {
-			CratePlayer crate = new CratePlayer(p);
+			CratePlayer crate = new CratePlayer(p, this);
 			addPlayer(crate);
 		}
 		
@@ -81,14 +81,12 @@ public class ManCo extends JavaPlugin {
 	public static void log(LogType type, String message) {
 		Bukkit.getConsoleSender().sendMessage(type.getPrefix() + message);
 	}
-
-	/**
-	 * @author xize
-	 * @param returns the ManCo plugin
-	 * @return ManCo
-	 */
-	public static ManCo getPlugin() {
-		return manco;
+	
+	public SchematicUtils getSchematicUtils() {
+		if(schematic == null) {
+			this.schematic = new SchematicUtils(this);
+		}
+		return schematic;
 	}
 
 	/**
@@ -96,8 +94,8 @@ public class ManCo extends JavaPlugin {
 	 * @param returns the chest scheduler
 	 * @return ChestSChedule
 	 */
-	public static ChestSchedule getScheduler() {
-		return ManCo.getPlugin().scheduler;
+	public ChestSchedule getScheduler() {
+		return scheduler;
 	}
 
 	/**
@@ -105,8 +103,8 @@ public class ManCo extends JavaPlugin {
 	 * @param returns the singleton factory instance of the config.
 	 * @return Configuration
 	 */
-	public static Configuration getConfiguration() {
-		return ManCo.getPlugin().config;
+	public Configuration getConfiguration() {
+		return config;
 	}
 
 	/**
@@ -114,12 +112,12 @@ public class ManCo extends JavaPlugin {
 	 * @param returns the Handler
 	 * @return Handler
 	 */
-	public static Handler getHandlers() {
-		return ManCo.getPlugin().handler;
+	public Handler getHandlers() {
+		return handler;
 	}
 
-	public static ManCoApi getApi() {
-		return ManCo.getPlugin().api;
+	public ManCoApi getApi() {
+		return api;
 	}
 
 	/**
@@ -129,11 +127,11 @@ public class ManCo extends JavaPlugin {
 	 */
 	public boolean isCrate(String name) {
 		List<NormalCrate> crates = new ArrayList<NormalCrate>();
-		if(ManCo.getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
-			crates.addAll(ManCo.getConfiguration().crateList.get(CrateType.NORMAL).values());
+		if(getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
+			crates.addAll(getConfiguration().crateList.get(CrateType.NORMAL).values());
 		}
-		if(ManCo.getConfiguration().crateList.containsKey(CrateType.RARE)) {
-			crates.addAll(ManCo.getConfiguration().crateList.get(CrateType.RARE).values());
+		if(getConfiguration().crateList.containsKey(CrateType.RARE)) {
+			crates.addAll(getConfiguration().crateList.get(CrateType.RARE).values());
 		}
 		for(NormalCrate crate : crates) {
 			if(crate.getCrateName().equalsIgnoreCase(name.toLowerCase())) {
@@ -145,11 +143,11 @@ public class ManCo extends JavaPlugin {
 
 	public NormalCrate getCrate(String name) {
 		List<NormalCrate> crates = new ArrayList<NormalCrate>();
-		if(ManCo.getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
-			crates.addAll(ManCo.getConfiguration().crateList.get(CrateType.NORMAL).values());
+		if(getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
+			crates.addAll(getConfiguration().crateList.get(CrateType.NORMAL).values());
 		}
-		if(ManCo.getConfiguration().crateList.containsKey(CrateType.RARE)) {
-			crates.addAll(ManCo.getConfiguration().crateList.get(CrateType.RARE).values());
+		if(getConfiguration().crateList.containsKey(CrateType.RARE)) {
+			crates.addAll(getConfiguration().crateList.get(CrateType.RARE).values());
 		}
 		for(NormalCrate crate : crates) {
 			if(crate.getCrateName().equalsIgnoreCase(name.toLowerCase())) {
@@ -177,8 +175,8 @@ public class ManCo extends JavaPlugin {
 	 */
 	private void cleanup() {
 		for(Player p : ManCo.getOnlinePlayers()) {
-			if(ManCo.getPlugin().getCrateOwners().contains(p.getPlayer().getName())) {
-				ManCo.getPlugin().getCrateOwners().remove(p.getPlayer().getName());
+			if(getCrateOwners().contains(p.getPlayer().getName())) {
+				getCrateOwners().remove(p.getPlayer().getName());
 			}
 			if(p.getPlayer().hasMetadata("crate")) {
 				Chest chest = (Chest) ((FixedMetadataValue)p.getPlayer().getMetadata("crate").get(0)).value();
@@ -238,16 +236,16 @@ public class ManCo extends JavaPlugin {
 		return crateOwners;
 	}
 	
-	public static Hook getHooks() {
+	public Hook getHooks() {
 		if(!(hooks instanceof Hook)) {
 			hooks = new Hook();
 		}
 		return hooks;
 	}
 	
-	public static HookAble getHookManager() {
+	public HookAble getHookManager() {
 		if(!(hookss instanceof HookAble)) {
-			hookss = new HookAble();
+			this.hookss = new HookAble();
 		}
 		return hookss;
 	}

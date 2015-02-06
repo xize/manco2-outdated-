@@ -24,10 +24,14 @@ import tv.mineinthebox.manco.instances.RareCrate;
 
 public class ChestOpenEvent implements Listener {
 	
-	private HashSet<String> unlocked = new HashSet<String>();
-
-	private HashMap<String, Chest> timer = new HashMap<String, Chest>();
-
+	private final HashSet<String> unlocked = new HashSet<String>();
+	private final HashMap<String, Chest> timer = new HashMap<String, Chest>();
+    private final ManCo pl;
+    
+    public ChestOpenEvent(ManCo pl) {
+    	this.pl = pl;
+    }
+	
 	@EventHandler
 	public void onOpen(final InventoryOpenEvent e) {
 		if(e.isCancelled()) {
@@ -49,7 +53,7 @@ public class ChestOpenEvent implements Listener {
 					e.setCancelled(true);
 					return;
 				}
-				final NormalCrate crate = ManCo.getPlugin().getCrate(((FixedMetadataValue)chest.getMetadata("crate_serie").get(0)).asString());
+				final NormalCrate crate = pl.getCrate(((FixedMetadataValue)chest.getMetadata("crate_serie").get(0)).asString());
 				
 				
 				if(crate.needsKey()) {
@@ -92,7 +96,7 @@ public class ChestOpenEvent implements Listener {
 
 					public void playSound(final Player p, final Chest chest, final Sound sound) {
 						soundTime += 1;
-						Bukkit.getScheduler().scheduleSyncDelayedTask(ManCo.getPlugin(), new Runnable() {
+						Bukkit.getScheduler().scheduleSyncDelayedTask(pl, new Runnable() {
 
 
 							@Override
@@ -130,7 +134,7 @@ public class ChestOpenEvent implements Listener {
 						} else {
 							if(i == 10) {
 								if(crate.getType() == CrateType.RARE) {
-									RareCrate rcrate = new RareCrate(crate.getCrateName());
+									RareCrate rcrate = new RareCrate(crate.getCrateName(), pl);
 									if(rcrate.hasEffects()) {
 										Effect effect = rcrate.getEffect();
 										Sound sound = rcrate.getEffectSound();
@@ -155,7 +159,7 @@ public class ChestOpenEvent implements Listener {
 								}
 							} else {
 								if(crate.getType() == CrateType.RARE) {
-									RareCrate rcrate = new RareCrate(crate.getCrateName());
+									RareCrate rcrate = new RareCrate(crate.getCrateName(), pl);
 									if(rcrate.hasEffects()) {
 										p.sendMessage(ChatColor.GOLD + "opening crate in " + i + " seconds");
 										playSound(p, chest, Sound.HORSE_ARMOR);
@@ -181,7 +185,7 @@ public class ChestOpenEvent implements Listener {
 						i--;
 					}
 
-				}.runTaskTimer(ManCo.getPlugin(), 0L, 10L);
+				}.runTaskTimer(pl, 0L, 10L);
 			}
 		}
 	}

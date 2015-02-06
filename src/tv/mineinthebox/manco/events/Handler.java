@@ -21,33 +21,33 @@ import tv.mineinthebox.manco.events.schematics.SchematicPasteEvent;
 
 public class Handler {
 	
-	private final ManCo manco;
+	private final ManCo pl;
 	
-	public Handler(ManCo manco) {
-		this.manco = manco;
+	public Handler(ManCo pl) {
+		this.pl = pl;
 	}
 	
 	public void start() {
-		setListener(new BlockFallEvent());
-		setListener(new CleanMemoryEvent());
+		setListener(new BlockFallEvent(pl));
+		setListener(new CleanMemoryEvent(pl));
 		setListener(new BlockProtectEvent());
-		setListener(new EditorEvent());
-		setListener(new ChestCloseEvent());
-		setListener(new ChestOpenEvent());
-		setListener(new MoneyConsumeEvent());
-		setListener(new SchematicPasteEvent());
+		setListener(new EditorEvent(pl));
+		setListener(new ChestCloseEvent(pl));
+		setListener(new ChestOpenEvent(pl));
+		setListener(new MoneyConsumeEvent(pl));
+		setListener(new SchematicPasteEvent(pl));
 		setListener(new SchematicEntityDeath());
 		setListener(new ChestPlaceEvent());
-		setListener(new PlayerOnJoinEvent());
-		setListener(new PlayerOnQuitEvent());
-		setListener(new KeyCraftEvent());
-		if(ManCo.getConfiguration().hasProtection()) {
+		setListener(new PlayerOnJoinEvent(pl));
+		setListener(new PlayerOnQuitEvent(pl));
+		setListener(new KeyCraftEvent(pl));
+		if(pl.getConfiguration().hasProtection()) {
 			setListener(new PlayerCrateProtectionEvent());
 		}
 	}
 	
 	public void setListener(Listener listener) {
-		Bukkit.getPluginManager().registerEvents(listener, manco);
+		Bukkit.getPluginManager().registerEvents(listener, pl);
 	}
 
 }

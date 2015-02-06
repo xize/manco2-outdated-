@@ -8,10 +8,12 @@ import tv.mineinthebox.manco.ManCo;
 
 public class CratePlayer implements Comparable<String> {
 	
-	Player p;
+	private final Player p;
+	private final ManCo pl;
 	
-	public CratePlayer(Player p) {
+	public CratePlayer(Player p, ManCo pl) {
 		this.p = p;
+		this.pl = pl;
 	}
 	
 	/**
@@ -29,7 +31,7 @@ public class CratePlayer implements Comparable<String> {
 	 * @return Boolean
 	 */
 	public boolean hasCrate() {
-		return (ManCo.getPlugin().getCrateOwners().contains(p.getName()) && p.hasMetadata("crate"));
+		return (pl.getCrateOwners().contains(p.getName()) && p.hasMetadata("crate"));
 	}
 	
 	/**

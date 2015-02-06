@@ -20,10 +20,10 @@ public class RareCrate extends NormalCrate {
 	private final File f;
 	private String crate;
 
-	public RareCrate(String crate) {
-		super(crate);
-		this.f = ManCo.getConfiguration().getFile();
-		this.con = ManCo.getConfiguration().getConfig();
+	public RareCrate(String crate, ManCo pl) {
+		super(crate, pl);
+		this.f = pl.getConfiguration().getFile();
+		this.con = pl.getConfiguration().getConfig();
 		this.crate = crate;
 	}
 

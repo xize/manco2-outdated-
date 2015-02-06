@@ -127,7 +127,7 @@ public class Configuration {
 			crateList.clear();
 		}
 		for(String name : con.getConfigurationSection("crates.crate").getKeys(false)) {
-			NormalCrate crate = new NormalCrate(name);
+			NormalCrate crate = new NormalCrate(name, pl);
 			if(crate.isEnabled()) {
 				if(!crateList.containsKey(crate.getType())) {
 					HashMap<String, NormalCrate> hash = new HashMap<String, NormalCrate>();
@@ -185,11 +185,11 @@ public class Configuration {
 	}
 	
 	public void reload() {
-		HandlerList.getRegisteredListeners(ManCo.getPlugin());
+		HandlerList.getRegisteredListeners(pl);
 		try {
 			con.load(f);
 			loadCrates();
-			ManCo.getScheduler().restart();
+			pl.getScheduler().restart();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -200,7 +200,7 @@ public class Configuration {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ManCo.getHandlers().start();
+		pl.getHandlers().start();
 	}
 	
 	/**

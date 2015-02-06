@@ -27,11 +27,14 @@ import tv.mineinthebox.manco.instances.Schematic;
  */
 public class SchematicUtils {
 
-	private static File baseSchematicsFile = new File(ManCo.getPlugin().getDataFolder() + File.separator + "schematics");
+	private final File baseSchematicsFile;
+	private final List<Schematic> allSchematics = new ArrayList<Schematic>();
 
-	private static List<Schematic> allSchematics = new ArrayList<Schematic>();
-
-	public static void initSchematics(){
+	public SchematicUtils(ManCo pl) {
+		this.baseSchematicsFile = new File(pl.getDataFolder() + File.separator + "schematics");
+	}
+	
+	public void initSchematics(){
 		allSchematics.clear();
 		for(File schematicFile : baseSchematicsFile.listFiles()){
 			if(!(schematicFile.getName().startsWith("."))){
@@ -43,25 +46,25 @@ public class SchematicUtils {
 		}
 	}
 
-	public static boolean doesExist(String name) {
+	public boolean doesExist(String name) {
 		for(Schematic schem : getAllSchematics()) {
 			if(schem.getName().equalsIgnoreCase(name)) return true;
 		}
 		return false;
 	}
 
-	public static Schematic getByName(String name) {
+	public Schematic getByName(String name) {
 		for(Schematic schem : getAllSchematics()) {
 			if(schem.getName().equalsIgnoreCase(name)) return schem;
 		}
 		return null;
 	}
 
-	public static List<Schematic> getAllSchematics(){
+	public List<Schematic> getAllSchematics(){
 		return allSchematics;
 	}
 
-	public static Schematic loadSchematic(File file){
+	public Schematic loadSchematic(File file){
 		try{
 			if(file.exists()){
 				NBTInputStream nbtStream =  new NBTInputStream(new FileInputStream(file));

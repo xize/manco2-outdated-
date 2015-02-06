@@ -24,9 +24,14 @@ import tv.mineinthebox.manco.enums.CrateType;
 import tv.mineinthebox.manco.instances.NormalCrate;
 import tv.mineinthebox.manco.instances.RareCrate;
 import tv.mineinthebox.manco.instances.Schematic;
-import tv.mineinthebox.manco.utils.SchematicUtils;
 
-public class command implements CommandExecutor {
+public class MancoCommand implements CommandExecutor {
+	
+	private final ManCo pl;
+	
+	public MancoCommand(ManCo pl) {
+		this.pl = pl;
+	}
 	
 	@SuppressWarnings("deprecation")
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -34,7 +39,7 @@ public class command implements CommandExecutor {
 			if(sender.hasPermission("manco.command.manco")) {
 				if(args.length == 0) {
 					sender.sendMessage(ChatColor.GOLD + ".oO___[ManCo help]___Oo.");
-					sender.sendMessage(ChatColor.GREEN + "version: "+ManCo.getPlugin().getDescription().getVersion()+" made by xize.");
+					sender.sendMessage(ChatColor.GREEN + "version: "+pl.getDescription().getVersion()+" made by xize.");
 					sender.sendMessage(ChatColor.DARK_GRAY + "Default: " + ChatColor.GRAY + "/manco help " + ChatColor.WHITE + ": shows help");
 					sender.sendMessage(ChatColor.DARK_GRAY + "Default: " + ChatColor.GRAY + "/manco list " + ChatColor.WHITE + ": shows all the keys and prices");
 					sender.sendMessage(ChatColor.DARK_GRAY + "Default: " + ChatColor.GRAY + "/manco buy <crate> " + ChatColor.WHITE + ": allows to buy a key for a crate");
@@ -55,7 +60,7 @@ public class command implements CommandExecutor {
 				} else if(args.length == 1) {
 					if(args[0].equalsIgnoreCase("help")) {
 						sender.sendMessage(ChatColor.GOLD + ".oO___[ManCo help]___Oo.");
-						sender.sendMessage(ChatColor.GREEN + "version: "+ManCo.getPlugin().getDescription().getVersion()+" made by xize.");
+						sender.sendMessage(ChatColor.GREEN + "version: "+pl.getDescription().getVersion()+" made by xize.");
 						sender.sendMessage(ChatColor.DARK_GRAY + "Default: " + ChatColor.GRAY + "/manco help " + ChatColor.WHITE + ": shows help");
 						sender.sendMessage(ChatColor.DARK_GRAY + "Default: " + ChatColor.GRAY + "/manco list " + ChatColor.WHITE + ": shows all the keys and prices");
 						sender.sendMessage(ChatColor.DARK_GRAY + "Default: " + ChatColor.GRAY + "/manco buy <crate> " + ChatColor.WHITE + ": allows to buy a key for a crate");
@@ -75,18 +80,18 @@ public class command implements CommandExecutor {
 						}
 					} else if(args[0].equalsIgnoreCase("reload")) {
 						if(sender.hasPermission("manco.isadmin")) {
-							ManCo.getConfiguration().reload();
+							pl.getConfiguration().reload();
 							sender.sendMessage(ChatColor.GREEN + "ManCo supply crates has been reloaded!");
 						} else {
 							sender.sendMessage(ChatColor.RED + "you cannot do that.");
 						}
 					} else if(args[0].equalsIgnoreCase("list")) {
 						List<NormalCrate> crates = new ArrayList<NormalCrate>();
-						if(ManCo.getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
-							crates.addAll(ManCo.getConfiguration().crateList.get(CrateType.NORMAL).values());
+						if(pl.getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
+							crates.addAll(pl.getConfiguration().crateList.get(CrateType.NORMAL).values());
 						}
-						if(ManCo.getConfiguration().crateList.containsKey(CrateType.RARE)) {
-							crates.addAll(ManCo.getConfiguration().crateList.get(CrateType.RARE).values());
+						if(pl.getConfiguration().crateList.containsKey(CrateType.RARE)) {
+							crates.addAll(pl.getConfiguration().crateList.get(CrateType.RARE).values());
 						}
 						String message = "";
 						if(!crates.isEmpty()) {
@@ -102,7 +107,7 @@ public class command implements CommandExecutor {
 										}
 									}
 								} else if(crate.getType() == CrateType.RARE) {
-									RareCrate rCrate = new RareCrate(crate.getCrateName());
+									RareCrate rCrate = new RareCrate(crate.getCrateName(), pl);
 									if(rCrate.needsKey()) {
 										if(i == crates.size()) {
 											message += ChatColor.DARK_PURPLE + "[RareCrate]" + ChatColor.GRAY + rCrate.getCrateName() + "(" + rCrate.getKeyPrice() + "$)";
@@ -121,11 +126,11 @@ public class command implements CommandExecutor {
 					}  else if(args[0].equalsIgnoreCase("crates")) {
 						if(sender.hasPermission("manco.isadmin")) {
 							List<NormalCrate> crates = new ArrayList<NormalCrate>();
-							if(ManCo.getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
-								crates.addAll(ManCo.getConfiguration().crateList.get(CrateType.NORMAL).values());
+							if(pl.getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
+								crates.addAll(pl.getConfiguration().crateList.get(CrateType.NORMAL).values());
 							}
-							if(ManCo.getConfiguration().crateList.containsKey(CrateType.RARE)) {
-								crates.addAll(ManCo.getConfiguration().crateList.get(CrateType.RARE).values());
+							if(pl.getConfiguration().crateList.containsKey(CrateType.RARE)) {
+								crates.addAll(pl.getConfiguration().crateList.get(CrateType.RARE).values());
 							}
 
 							String message = "";
@@ -146,13 +151,13 @@ public class command implements CommandExecutor {
 				} else if(args.length == 2) {
 					if(args[0].equalsIgnoreCase("buy")) {
 						if(sender instanceof Player) {
-							if(ManCo.getPlugin().isCrate(args[1])) {
-								NormalCrate crate = ManCo.getPlugin().getCrate(args[1]);
-								if(ManCo.getHooks().isVaultEnabled()) {
-									if(ManCo.getHookManager().getVaultHook().hasEnough(sender.getName(), crate.getKeyPrice())) {
+							if(pl.isCrate(args[1])) {
+								NormalCrate crate = pl.getCrate(args[1]);
+								if(pl.getHooks().isVaultEnabled()) {
+									if(pl.getHookManager().getVaultHook().hasEnough(sender.getName(), crate.getKeyPrice())) {
 										Player p = (Player) sender;
 										if(!(p.getInventory().firstEmpty() == -1)) {
-											ManCo.getHookManager().getVaultHook().withdraw(sender.getName(), crate.getKeyPrice());
+											pl.getHookManager().getVaultHook().withdraw(sender.getName(), crate.getKeyPrice());
 											p.getInventory().addItem(crate.getKeyItem());
 										} else {
 											sender.sendMessage(ChatColor.RED + "you inventory is full!");
@@ -172,7 +177,7 @@ public class command implements CommandExecutor {
 					} else if(args[0].equalsIgnoreCase("create")) {
 						if(sender.hasPermission("manco.isadmin")) {
 							if(sender instanceof Player) {
-								if(!ManCo.getPlugin().isCrate(args[1])) {
+								if(!pl.isCrate(args[1])) {
 									Player p = (Player) sender;
 									Inventory inv = Bukkit.createInventory(null, InventoryType.CHEST.getDefaultSize(), "mc:"+args[1].toLowerCase());
 									sender.sendMessage(ChatColor.GREEN + "opening crate editor for player " + sender.getName());
@@ -189,9 +194,9 @@ public class command implements CommandExecutor {
 					} else if(args[0].equalsIgnoreCase("edit")) {
 						if(sender.hasPermission("manco.isadmin")) {
 							if(sender instanceof Player) {
-								if(ManCo.getPlugin().isCrate(args[1])) {
+								if(pl.isCrate(args[1])) {
 									Player p = (Player) sender;
-									NormalCrate crate = ManCo.getPlugin().getCrate(args[1]);
+									NormalCrate crate = pl.getCrate(args[1]);
 									Inventory inv = Bukkit.createInventory(null, InventoryType.CHEST.getDefaultSize(), "me:"+args[1].toLowerCase());
 									inv.setContents(crate.getRandomItems().toArray(new ItemStack[crate.getRandomItems().size()]));
 									sender.sendMessage(ChatColor.GREEN + "opening crate editor for player " + sender.getName());
@@ -207,8 +212,8 @@ public class command implements CommandExecutor {
 						}
 					} else if(args[0].equalsIgnoreCase("delete")) {
 						if(sender.hasPermission("manco.isadmin")) {
-							if(ManCo.getPlugin().isCrate(args[1])) {
-								NormalCrate crate = ManCo.getPlugin().getCrate(args[1]);
+							if(pl.isCrate(args[1])) {
+								NormalCrate crate = pl.getCrate(args[1]);
 								crate.remove();
 								sender.sendMessage(ChatColor.GREEN + "you have successfully removed this crate.");
 							} else {
@@ -219,10 +224,10 @@ public class command implements CommandExecutor {
 						}
 					} else if(args[0].equalsIgnoreCase("disable")) {
 						if(sender.hasPermission("manco.isadmin")) {
-							if(ManCo.getPlugin().isCrate(args[1])) {
-								NormalCrate crate = ManCo.getPlugin().getCrate(args[1]);
+							if(pl.isCrate(args[1])) {
+								NormalCrate crate = pl.getCrate(args[1]);
 								crate.setEnabled(false);
-								ManCo.getConfiguration().reload();
+								pl.getConfiguration().reload();
 							} else {
 								sender.sendMessage(ChatColor.RED + "this crate does not exist.");
 							}
@@ -231,10 +236,10 @@ public class command implements CommandExecutor {
 						}
 					} else if(args[0].equalsIgnoreCase("enable")) {
 						if(sender.hasPermission("manco.isadmin")) {
-							if(ManCo.getPlugin().isCrate(args[1])) {
-								NormalCrate crate = ManCo.getPlugin().getCrate(args[1]);
+							if(pl.isCrate(args[1])) {
+								NormalCrate crate = pl.getCrate(args[1]);
 								crate.setEnabled(true);
-								ManCo.getConfiguration().reload();
+								pl.getConfiguration().reload();
 							} else {
 								sender.sendMessage(ChatColor.RED + "this crate does not exist.");
 							}
@@ -245,30 +250,30 @@ public class command implements CommandExecutor {
 						if(sender instanceof Player) {
 							Player p = (Player) sender;
 							if(sender.hasPermission("manco.isadmin")) {
-								if(ManCo.getPlugin().isCrate(args[1])) {
+								if(pl.isCrate(args[1])) {
 									Random rand = new Random();
-									NormalCrate crate = ManCo.getPlugin().getCrate(args[1]);
+									NormalCrate crate = pl.getCrate(args[1]);
 
 									if(p.getLocation().getY() < 63) {
-										if(ManCo.getPlugin().canFall(p.getLocation().getBlock().getLocation())) {
-											if(ManCo.getConfiguration().isCrateMessagesEnabled()) {
+										if(pl.canFall(p.getLocation().getBlock().getLocation())) {
+											if(pl.getConfiguration().isCrateMessagesEnabled()) {
 												if(crate.getType() == CrateType.RARE) {
-													Bukkit.broadcastMessage(ManCo.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+													Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 												} else if(crate.getType() == CrateType.NORMAL) {
-													Bukkit.broadcastMessage(ManCo.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+													Bukkit.broadcastMessage(pl.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 												}
 											}
 
-											if(ManCo.getConfiguration().isSpawnRandom()) {
+											if(pl.getConfiguration().isSpawnRandom()) {
 												FallingBlock fall = p.getWorld().spawnFallingBlock(p.getWorld().getHighestBlockAt(p.getLocation()).getLocation().add(rand.nextInt(10), 30, rand.nextInt(10)), Material.CHEST, (byte)0);
-												fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-												fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-												ManCo.getPlugin().getCrateOwners().add(p.getName());
+												fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+												fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+												pl.getCrateOwners().add(p.getName());
 											} else {
 												FallingBlock fall = p.getWorld().spawnFallingBlock(p.getLocation().add(0, 1, 0), Material.CHEST, (byte)0);
-												fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-												fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-												ManCo.getPlugin().getCrateOwners().add(p.getName());
+												fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+												fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+												pl.getCrateOwners().add(p.getName());
 											}
 										} else {
 											sender.sendMessage(ChatColor.RED + "you are standing on a adjacent block which isn't solid and breaks the falling block.");
@@ -276,25 +281,25 @@ public class command implements CommandExecutor {
 										}
 									} else {
 										Location highest = p.getWorld().getHighestBlockAt(p.getLocation()).getLocation();
-										if(ManCo.getPlugin().canFall(highest)) {
-											if(ManCo.getConfiguration().isCrateMessagesEnabled()) {
+										if(pl.canFall(highest)) {
+											if(pl.getConfiguration().isCrateMessagesEnabled()) {
 												if(crate.getType() == CrateType.RARE) {
-													Bukkit.broadcastMessage(ManCo.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+													Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 												} else if(crate.getType() == CrateType.NORMAL) {
-													Bukkit.broadcastMessage(ManCo.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+													Bukkit.broadcastMessage(pl.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 												}
 											}
 
-											if(ManCo.getConfiguration().isSpawnRandom()) {
+											if(pl.getConfiguration().isSpawnRandom()) {
 												FallingBlock fall = p.getWorld().spawnFallingBlock(highest.add(rand.nextInt(10), 30, rand.nextInt(10)), Material.CHEST, (byte)0);
-												fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-												fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-												ManCo.getPlugin().getCrateOwners().add(p.getName());
+												fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+												fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+												pl.getCrateOwners().add(p.getName());
 											} else {
 												FallingBlock fall = p.getWorld().spawnFallingBlock(highest.add(0, 30, 0), Material.CHEST, (byte)0);
-												fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-												fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-												ManCo.getPlugin().getCrateOwners().add(p.getName());
+												fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+												fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+												pl.getCrateOwners().add(p.getName());
 											}
 										} else {
 											sender.sendMessage(ChatColor.RED + "you are standing on a adjacent block which isn't solid and breaks the falling block.");
@@ -314,30 +319,30 @@ public class command implements CommandExecutor {
 						if(sender.hasPermission("manco.isadmin")) {
 							Player p = Bukkit.getPlayer(args[1]);
 							if(p instanceof Player) {
-								if(ManCo.getPlugin().isCrate(args[2])) {
+								if(pl.isCrate(args[2])) {
 									Random rand = new Random();
-									NormalCrate crate = ManCo.getPlugin().getCrate(args[2]);
+									NormalCrate crate = pl.getCrate(args[2]);
 
 									if(p.getLocation().getY() < 63) {
-										if(ManCo.getPlugin().canFall(p.getLocation().getBlock().getLocation())) {
-											if(ManCo.getConfiguration().isCrateMessagesEnabled()) {
+										if(pl.canFall(p.getLocation().getBlock().getLocation())) {
+											if(pl.getConfiguration().isCrateMessagesEnabled()) {
 												if(crate.getType() == CrateType.RARE) {
-													Bukkit.broadcastMessage(ManCo.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+													Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 												} else if(crate.getType() == CrateType.NORMAL) {
-													Bukkit.broadcastMessage(ManCo.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+													Bukkit.broadcastMessage(pl.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 												}
 											}
 
-											if(ManCo.getConfiguration().isSpawnRandom()) {
+											if(pl.getConfiguration().isSpawnRandom()) {
 												FallingBlock fall = p.getWorld().spawnFallingBlock(p.getWorld().getHighestBlockAt(p.getLocation()).getLocation().add(rand.nextInt(10), 30, rand.nextInt(10)), Material.CHEST, (byte)0);
-												fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-												fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-												ManCo.getPlugin().getCrateOwners().add(p.getName());
+												fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+												fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+												pl.getCrateOwners().add(p.getName());
 											} else {
 												FallingBlock fall = p.getWorld().spawnFallingBlock(p.getLocation().add(0, 1, 0), Material.CHEST, (byte)0);
-												fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-												fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-												ManCo.getPlugin().getCrateOwners().add(p.getName());
+												fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+												fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+												pl.getCrateOwners().add(p.getName());
 											}
 										} else {
 											sender.sendMessage(ChatColor.RED + "cannot spawn crate he is standing on a adjacent block which isn't solid and breaks the falling block.");
@@ -345,25 +350,25 @@ public class command implements CommandExecutor {
 										}
 									} else {
 										Location highest = p.getWorld().getHighestBlockAt(p.getLocation()).getLocation();
-										if(ManCo.getPlugin().canFall(highest)) {
-											if(ManCo.getConfiguration().isCrateMessagesEnabled()) {
+										if(pl.canFall(highest)) {
+											if(pl.getConfiguration().isCrateMessagesEnabled()) {
 												if(crate.getType() == CrateType.RARE) {
-													Bukkit.broadcastMessage(ManCo.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+													Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 												} else if(crate.getType() == CrateType.NORMAL) {
-													Bukkit.broadcastMessage(ManCo.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+													Bukkit.broadcastMessage(pl.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 												}
 											}
 
-											if(ManCo.getConfiguration().isSpawnRandom()) {
+											if(pl.getConfiguration().isSpawnRandom()) {
 												FallingBlock fall = p.getWorld().spawnFallingBlock(highest.add(rand.nextInt(10), 30, rand.nextInt(10)), Material.CHEST, (byte)0);
-												fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-												fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-												ManCo.getPlugin().getCrateOwners().add(p.getName());
+												fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+												fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+												pl.getCrateOwners().add(p.getName());
 											} else {
 												FallingBlock fall = p.getWorld().spawnFallingBlock(highest.add(0, 30, 0), Material.CHEST, (byte)0);
-												fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-												fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-												ManCo.getPlugin().getCrateOwners().add(p.getName());
+												fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+												fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+												pl.getCrateOwners().add(p.getName());
 											}
 										} else {
 											sender.sendMessage(ChatColor.RED + "cannot spawn crate he is standing on a adjacent block which isn't solid and breaks the falling block.");
@@ -381,15 +386,15 @@ public class command implements CommandExecutor {
 						}
 					} else if(args[0].equalsIgnoreCase("setType")) {
 						if(sender.hasPermission("manco.isadmin")) {
-							if(ManCo.getPlugin().isCrate(args[1])) {
-								NormalCrate crate = ManCo.getPlugin().getCrate(args[1]);
+							if(pl.isCrate(args[1])) {
+								NormalCrate crate = pl.getCrate(args[1]);
 								if(args[2].equalsIgnoreCase(CrateType.RARE.name())) {
 									crate.setType(CrateType.RARE);
-									ManCo.getConfiguration().reload();
+									pl.getConfiguration().reload();
 									sender.sendMessage(ChatColor.GREEN + "you have successfully changed the type to rare");
 								} else if(args[2].equalsIgnoreCase(CrateType.NORMAL.name())) {
 									crate.setType(CrateType.NORMAL);
-									ManCo.getConfiguration().reload();
+									pl.getConfiguration().reload();
 									sender.sendMessage(ChatColor.GREEN + "you have successfully changed the type to normal");
 								} else {
 									sender.sendMessage(ChatColor.RED + "invalid crate type.");
@@ -440,9 +445,9 @@ public class command implements CommandExecutor {
 							if(sender.hasPermission("manco.give.schematic")) {
 								if(sender instanceof Player) {
 									Player p = (Player) sender;
-									SchematicUtils.initSchematics();
-									if(SchematicUtils.doesExist(args[2])) {
-										Schematic schem = SchematicUtils.getByName(args[2]);
+									pl.getSchematicUtils().initSchematics();
+									if(pl.getSchematicUtils().doesExist(args[2])) {
+										Schematic schem = pl.getSchematicUtils().getByName(args[2]);
 
 										try {
 											int amount = Integer.parseInt(args[3]);

@@ -23,13 +23,15 @@ import tv.mineinthebox.manco.exceptions.InvalidCrateException;
 
 public class NormalCrate {
 
+	private final ManCo pl;
 	private final File f;
 	private final FileConfiguration con;
 	private final String crate;
 
-	public NormalCrate(String crate) {
-		this.f = ManCo.getConfiguration().getFile();
-		this.con = ManCo.getConfiguration().getConfig();
+	public NormalCrate(String crate, ManCo pl) {
+		this.pl = pl;
+		this.f = pl.getConfiguration().getFile();
+		this.con = pl.getConfiguration().getConfig();
 		this.crate = crate;
 		if(!this.con.contains("crates.crate."+crate.toLowerCase())) {
 			try {
@@ -196,7 +198,7 @@ public class NormalCrate {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ManCo.getConfiguration().reload();
+		pl.getConfiguration().reload();
 	}
 
 	/**

@@ -31,16 +31,18 @@ public class SchematicBuilder {
 	private final Location playerLoc;
 	private Player player;
 	private boolean warning = false;
+	private final ManCo pl;
+	
+	private final LinkedHashMap<Block, Integer> data = new LinkedHashMap<Block, Integer>();
 
-	private LinkedHashMap<Block, Integer> data = new LinkedHashMap<Block, Integer>();
-
-	public SchematicBuilder(Schematic schematic, Location base, Player player) {
+	public SchematicBuilder(Schematic schematic, Location base, Player player, ManCo pl) {
 		this.schematic = schematic;
 		this.loc = base;
 		this.playerLoc = loc.clone();
 		this.loc.setX(loc.getX()-(schematic.getWidth()/2));
 		this.loc.setZ(loc.getZ()-(schematic.getLength()/2));
 		this.player = player;
+		this.pl = pl;
 	}
 
 	/**
@@ -162,7 +164,7 @@ public class SchematicBuilder {
 
 			}
 
-		}.runTaskTimer(ManCo.getPlugin(), 0L, 1L);
+		}.runTaskTimer(pl, 0L, 1L);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -182,15 +184,15 @@ public class SchematicBuilder {
 
 	private void saveRollback(Block block, Player p) {
 		if(p instanceof Player) {
-			if(ManCo.getHooks().isNCPEnabled()) {
-				if(!ManCo.getHookManager().getNcpHook().isBlockPlaceExempted(p.getName())) {
-					ManCo.getHookManager().getNcpHook().exemptBlockPlaceHacks(p);
+			if(pl.getHooks().isNCPEnabled()) {
+				if(!pl.getHookManager().getNcpHook().isBlockPlaceExempted(p.getName())) {
+					pl.getHookManager().getNcpHook().exemptBlockPlaceHacks(p);
 				}
 			}
 			Bukkit.getPluginManager().callEvent(new BlockPlaceEvent(block, null, block, p.getItemInHand(), p, true));
-			if(ManCo.getHooks().isNCPEnabled()) {
-				if(!ManCo.getHookManager().getNcpHook().isBlockPlaceExempted(p.getName())) {
-					ManCo.getHookManager().getNcpHook().unExcemptBlockPlaceHacks(p);
+			if(pl.getHooks().isNCPEnabled()) {
+				if(!pl.getHookManager().getNcpHook().isBlockPlaceExempted(p.getName())) {
+					pl.getHookManager().getNcpHook().unExcemptBlockPlaceHacks(p);
 				}
 			}
 		}

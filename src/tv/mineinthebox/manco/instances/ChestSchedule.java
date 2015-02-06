@@ -24,16 +24,18 @@ import tv.mineinthebox.manco.enums.LogType;
 public class ChestSchedule implements Runnable {
 
 	private final Random rand = new Random();
+	private final ManCo pl;
 
 	private BukkitTask task;
 	
-	public ChestSchedule() {
-		this.task = Bukkit.getScheduler().runTaskTimer(ManCo.getPlugin(), this, 100, ManCo.getConfiguration().getScheduleTime()*60*60*20);
+	public ChestSchedule(ManCo pl) {
+		this.pl = pl;
+		this.task = Bukkit.getScheduler().runTaskTimer(pl, this, 100, pl.getConfiguration().getScheduleTime()*60*60*20);
 	}
 	
 	public void restart() {
 		stop();
-		 Bukkit.getScheduler().runTaskTimer(ManCo.getPlugin(), this, 0, ManCo.getConfiguration().getScheduleTime());
+		 Bukkit.getScheduler().runTaskTimer(pl, this, 0, pl.getConfiguration().getScheduleTime());
 	}
 	
 	public void stop() {
@@ -46,18 +48,18 @@ public class ChestSchedule implements Runnable {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
-		if(ManCo.getOnlinePlayers().length >= ManCo.getConfiguration().getDropsPerSchedule()) {
-			for(int i = 0; i < ManCo.getConfiguration().getDropsPerSchedule(); i++) {
+		if(ManCo.getOnlinePlayers().length >= pl.getConfiguration().getDropsPerSchedule()) {
+			for(int i = 0; i < pl.getConfiguration().getDropsPerSchedule(); i++) {
 				List<String> cratelist = new ArrayList<String>();
 
 				if(isRare()) {
-					if(ManCo.getConfiguration().crateList.containsKey(CrateType.RARE)) {
-						cratelist = Arrays.asList(ManCo.getConfiguration().crateList.get(CrateType.RARE).keySet().toArray(new String[ManCo.getConfiguration().crateList.size()]));
+					if(pl.getConfiguration().crateList.containsKey(CrateType.RARE)) {
+						cratelist = Arrays.asList(pl.getConfiguration().crateList.get(CrateType.RARE).keySet().toArray(new String[pl.getConfiguration().crateList.size()]));
 					} else {
-						cratelist = Arrays.asList(ManCo.getConfiguration().crateList.get(CrateType.NORMAL).keySet().toArray(new String[ManCo.getConfiguration().crateList.size()]));
+						cratelist = Arrays.asList(pl.getConfiguration().crateList.get(CrateType.NORMAL).keySet().toArray(new String[pl.getConfiguration().crateList.size()]));
 					}
 				} else {
-					cratelist = Arrays.asList(ManCo.getConfiguration().crateList.get(CrateType.NORMAL).keySet().toArray(new String[ManCo.getConfiguration().crateList.size()]));
+					cratelist = Arrays.asList(pl.getConfiguration().crateList.get(CrateType.NORMAL).keySet().toArray(new String[pl.getConfiguration().crateList.size()]));
 				}
 
 				if(cratelist.isEmpty()) {
@@ -71,51 +73,51 @@ public class ChestSchedule implements Runnable {
 					return;
 				}
 				
-				NormalCrate crate = ManCo.getPlugin().getCrate(crateid);
+				NormalCrate crate = pl.getCrate(crateid);
 
 				if(p.getLocation().getY() < 63) {
 					if(canFall(p.getLocation().getBlock().getLocation())) {
-						if(ManCo.getConfiguration().isCrateMessagesEnabled()) {
+						if(pl.getConfiguration().isCrateMessagesEnabled()) {
 							if(crate.getType() == CrateType.RARE) {
-								Bukkit.broadcastMessage(ManCo.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+								Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 							} else if(crate.getType() == CrateType.NORMAL) {
-								Bukkit.broadcastMessage(ManCo.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+								Bukkit.broadcastMessage(pl.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 							}
 						}
 
-						if(ManCo.getConfiguration().isSpawnRandom()) {
+						if(pl.getConfiguration().isSpawnRandom()) {
 							FallingBlock fall = p.getWorld().spawnFallingBlock(p.getWorld().getHighestBlockAt(p.getLocation()).getLocation().add(rand.nextInt(10), 30, rand.nextInt(10)), Material.CHEST, (byte)0);
-							fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-							fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-							ManCo.getPlugin().getCrateOwners().add(p.getName());
+							fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+							fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+							pl.getCrateOwners().add(p.getName());
 						} else {
 							FallingBlock fall = p.getWorld().spawnFallingBlock(p.getLocation().add(0, 1, 0), Material.CHEST, (byte)0);
-							fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-							fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-							ManCo.getPlugin().getCrateOwners().add(p.getName());
+							fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+							fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+							pl.getCrateOwners().add(p.getName());
 						}
 					}
 				} else {
 					Location highest = p.getWorld().getHighestBlockAt(p.getLocation()).getLocation();
 					if(canFall(highest)) {
-						if(ManCo.getConfiguration().isCrateMessagesEnabled()) {
+						if(pl.getConfiguration().isCrateMessagesEnabled()) {
 							if(crate.getType() == CrateType.RARE) {
-								Bukkit.broadcastMessage(ManCo.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+								Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 							} else if(crate.getType() == CrateType.NORMAL) {
-								Bukkit.broadcastMessage(ManCo.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
+								Bukkit.broadcastMessage(pl.getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
 							}
 						}
 
-						if(ManCo.getConfiguration().isSpawnRandom()) {
+						if(pl.getConfiguration().isSpawnRandom()) {
 							FallingBlock fall = p.getWorld().spawnFallingBlock(highest.add(rand.nextInt(10), 30, rand.nextInt(10)), Material.CHEST, (byte)0);
-							fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-							fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-							ManCo.getPlugin().getCrateOwners().add(p.getName());
+							fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+							fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+							pl.getCrateOwners().add(p.getName());
 						} else {
 							FallingBlock fall = p.getWorld().spawnFallingBlock(highest.add(0, 30, 0), Material.CHEST, (byte)0);
-							fall.setMetadata("crate_serie", new FixedMetadataValue(ManCo.getPlugin(), crate.getCrateName()));
-							fall.setMetadata("crate_owner", new FixedMetadataValue(ManCo.getPlugin(), p.getName()));
-							ManCo.getPlugin().getCrateOwners().add(p.getName());
+							fall.setMetadata("crate_serie", new FixedMetadataValue(pl, crate.getCrateName()));
+							fall.setMetadata("crate_owner", new FixedMetadataValue(pl, p.getName()));
+							pl.getCrateOwners().add(p.getName());
 						}
 					}
 				}
@@ -147,7 +149,7 @@ public class ChestSchedule implements Runnable {
 		}
 		Collections.shuffle(players);
 		for(Player p : players) {
-			if(!(ManCo.getPlugin().getCrateOwners().contains(p.getName()) || p.hasPermission("manco.bypass") || (ManCo.getHooks().isWorldGuardEnabled() ? ManCo.getHookManager().getWorldguardHook().isInRegion(p) : false))) {
+			if(!(pl.getCrateOwners().contains(p.getName()) || p.hasPermission("manco.bypass") || (pl.getHooks().isWorldGuardEnabled() ? pl.getHookManager().getWorldguardHook().isInRegion(p) : false))) {
 				return p;
 			}
 		}
@@ -161,6 +163,6 @@ public class ChestSchedule implements Runnable {
 	 * @return Boolean
 	 */
 	private boolean isRare() {
-		return (rand.nextInt(100) >= (100-ManCo.getConfiguration().getRareCrateChance()));
+		return (rand.nextInt(100) >= (100-pl.getConfiguration().getRareCrateChance()));
 	}
 }

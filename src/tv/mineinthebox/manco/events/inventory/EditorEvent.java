@@ -12,6 +12,12 @@ import tv.mineinthebox.manco.instances.NormalCrate;
 
 public class EditorEvent implements Listener {
 	
+	private final ManCo pl;
+	
+	public EditorEvent(ManCo pl) {
+		this.pl = pl;
+	}
+	
 	@EventHandler
 	public void onOpen(InventoryOpenEvent e) {
 		if(e.getInventory().getTitle().startsWith("me:") || e.getInventory().getTitle().startsWith("mc:")) {
@@ -23,7 +29,7 @@ public class EditorEvent implements Listener {
 	public void onEdit(InventoryCloseEvent e) {
 		if(e.getInventory().getTitle().startsWith("me:")) {
 			String name = e.getInventory().getTitle().substring("me:".length());
-			NormalCrate crate = ManCo.getPlugin().getCrate(name);
+			NormalCrate crate = pl.getCrate(name);
 			crate.setRandomItems(e.getInventory().getContents());
 		}
 	}
@@ -32,7 +38,7 @@ public class EditorEvent implements Listener {
 	public void onCreate(InventoryCloseEvent e) {
 		if(e.getInventory().getTitle().startsWith("mc:")) {
 			String name = e.getInventory().getTitle().substring("mc:".length());
-			ManCo.getApi().addCrateSerie(name, CrateType.NORMAL, e.getInventory().getContents());
+			pl.getApi().addCrateSerie(name, CrateType.NORMAL, e.getInventory().getContents());
 		}
 	}
 

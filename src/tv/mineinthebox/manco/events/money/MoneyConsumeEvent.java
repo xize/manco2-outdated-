@@ -13,6 +13,12 @@ import tv.mineinthebox.manco.ManCo;
 
 public class MoneyConsumeEvent implements Listener {
 	
+	private final ManCo pl;
+	
+	public MoneyConsumeEvent(ManCo pl) {
+		this.pl = pl;
+	}
+	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
 		if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -20,8 +26,8 @@ public class MoneyConsumeEvent implements Listener {
 				if(e.getItem().hasItemMeta()) {
 					if(e.getItem().getItemMeta().hasDisplayName()) {
 						if(isMoney(e.getItem().getItemMeta().getDisplayName())) {
-							if(ManCo.getHooks().isVaultEnabled()) {
-								ManCo.getHookManager().getVaultHook().deposit(e.getPlayer().getName(), getMoney(e.getItem().getItemMeta().getDisplayName()));
+							if(pl.getHooks().isVaultEnabled()) {
+								pl.getHookManager().getVaultHook().deposit(e.getPlayer().getName(), getMoney(e.getItem().getItemMeta().getDisplayName()));
 								e.getPlayer().sendMessage(ChatColor.GREEN + "successfully added " + getMoney(e.getItem().getItemMeta().getDisplayName()) + "$");
 								if(e.getItem().getAmount() == 1) {
 									e.getPlayer().setItemInHand(null);

@@ -11,16 +11,22 @@ import tv.mineinthebox.manco.instances.CratePlayer;
 
 public class PlayerOnQuitEvent implements Listener {
 	
+	private final ManCo pl;
+	
+	public PlayerOnQuitEvent(ManCo pl) {
+		this.pl = pl;
+	}
+	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onQuit(PlayerQuitEvent e) {
-		CratePlayer p = ManCo.getPlugin().getCratePlayer(e.getPlayer().getName());
-		ManCo.getPlugin().removePlayer(p);
+		CratePlayer p = pl.getCratePlayer(e.getPlayer().getName());
+		pl.removePlayer(p);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onQuit(PlayerKickEvent e) {
-		CratePlayer p = ManCo.getPlugin().getCratePlayer(e.getPlayer().getName());
-		ManCo.getPlugin().removePlayer(p);
+		CratePlayer p = pl.getCratePlayer(e.getPlayer().getName());
+		pl.removePlayer(p);
 	}
 
 }
