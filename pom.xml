@@ -3,8 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tv.mineinthebox.manco</groupId>
 	<artifactId>ManCo</artifactId>
+	<version>3.0</version>
 	<build>
-	<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src</sourceDirectory>
 		<resources>
 			<resource>
 				<directory>${project.basedir}</directory>
@@ -69,20 +70,16 @@
 			<url>http://repo.bukkit.org/content/groups/public/</url>
 		</repository>
 		<repository>
-		<id>mitb-repo</id>
-		<url>http://ci.mineinthebox.tv:8080/plugin/repository/everything/</url>
-		</repository>
-		<repository>
 			<id>sk89q-repo</id>
 			<url>http://maven.sk89q.com/repo/</url>
 		</repository>
 		<repository>
-			<id>de-jas-rep</id>
-			<url>http://repo.ja-s.de/mvn/</url>
+			<id>mitb-repo</id>
+			<url>http://ci.mineinthebox.tv:8080/plugin/repository/everything/</url>
 		</repository>
 		<repository>
-			<id>prism</id>
-			<url>http://dhmc.us:8081/nexus/content/repositories/snapshots/me/botsko/prism/</url>
+			<id>de-jas-rep</id>
+			<url>http://repo.ja-s.de/mvn/</url>
 		</repository>
 		<repository>
 			<id>vault-repo</id>
@@ -93,12 +90,6 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>LATEST</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sk89q</groupId>
-			<artifactId>worldedit</artifactId>
 			<version>LATEST</version>
 			<scope>provided</scope>
 		</dependency>
@@ -115,18 +106,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.coreprotect</groupId>
-			<artifactId>coreprotect</artifactId>
-			<version>2.0.9</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>de.diddiz</groupId>
-			<artifactId>logblock</artifactId>
-			<version>1.70</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.jnbt</groupId>
 			<artifactId>jNBT</artifactId>
 			<version>1.2</version>
@@ -139,5 +118,4 @@
 			<systemPath>${project.basedir}${file.separator}repo${file.separator}nocheatplus-3.10.13-SNAPSHOT.jar</systemPath>
 		</dependency>
 	</dependencies>
-	<version>3.0</version>
 </project>
