@@ -271,7 +271,7 @@ public class MancoCommand implements CommandExecutor {
 												pl.getCrateOwners().add(p.getName());
 											}
 										} else {
-											sender.sendMessage(ChatColor.RED + "you are standing on a adjacent block which isn't solid and breaks the falling block.");
+											sender.sendMessage(ChatColor.RED + "could not spawn crate, because the player is either standing in a region or standing on a transparant block");
 											return false;
 										}
 									} else {
@@ -297,7 +297,7 @@ public class MancoCommand implements CommandExecutor {
 												pl.getCrateOwners().add(p.getName());
 											}
 										} else {
-											sender.sendMessage(ChatColor.RED + "you are standing on a adjacent block which isn't solid and breaks the falling block.");
+											sender.sendMessage(ChatColor.RED + "could not spawn crate, because the player is either standing in a region or standing on a transparant block");
 											return false;
 										}
 									}
@@ -340,7 +340,7 @@ public class MancoCommand implements CommandExecutor {
 												pl.getCrateOwners().add(p.getName());
 											}
 										} else {
-											sender.sendMessage(ChatColor.RED + "cannot spawn crate he is standing on a adjacent block which isn't solid and breaks the falling block.");
+											sender.sendMessage(ChatColor.RED + "could not spawn crate, because the player is either standing in a region or standing on a transparant block");
 											return false;
 										}
 									} else {
@@ -366,7 +366,7 @@ public class MancoCommand implements CommandExecutor {
 												pl.getCrateOwners().add(p.getName());
 											}
 										} else {
-											sender.sendMessage(ChatColor.RED + "cannot spawn crate he is standing on a adjacent block which isn't solid and breaks the falling block.");
+											sender.sendMessage(ChatColor.RED + "could not spawn crate, because the player is either standing in a region or standing on a transparant block");
 											return false;
 										}
 									}
@@ -479,7 +479,7 @@ public class MancoCommand implements CommandExecutor {
 					}
 				}
 			} else {
-				sender.sendMessage(ChatColor.RED + "you don't have permission.");
+				sender.sendMessage(ChatColor.RED + "you dont have permission");
 			}
 		}
 		return false;
