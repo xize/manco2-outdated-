@@ -1,34 +1,18 @@
 package tv.mineinthebox.manco.hooks;
 
+import tv.mineinthebox.manco.ManCo;
+
 
 public class HookAble {
 	
-	private CoreProtectHook core;
-	private LogBlockHook logblock;
-	private PrismHook prism;
 	private VaultHook vault;
 	private WorldGuardHook worldguard;
 	private NCPHook ncp;
 	
-	public CoreProtectHook getCoreProtectHook() {
-		if(!(this.core instanceof CoreProtectHook)) {
-			this.core = new CoreProtectHook();
-		}
-		return this.core;
-	}
+	private final ManCo pl;
 	
-	public LogBlockHook getLogBlockHook() {
-		if(!(this.logblock instanceof LogBlockHook)) {
-			this.logblock = new LogBlockHook();
-		}
-		return this.logblock;
-	}
-	
-	public PrismHook getPrismHook() {
-		if(!(this.prism instanceof PrismHook)) {
-			this.prism = new PrismHook();
-		}
-		return this.prism;
+	public HookAble(ManCo pl) {
+		this.pl = pl;
 	}
 	
 	public VaultHook getVaultHook() {
@@ -40,7 +24,7 @@ public class HookAble {
 	
 	public WorldGuardHook getWorldguardHook() {
 		if(!(this.worldguard instanceof WorldGuardHook)) {
-			this.worldguard = new WorldGuardHook();
+			this.worldguard = new WorldGuardHook(pl);
 		}
 		return this.worldguard;
 	}

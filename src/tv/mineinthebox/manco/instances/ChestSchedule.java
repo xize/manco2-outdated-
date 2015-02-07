@@ -8,7 +8,6 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -69,7 +68,7 @@ public class ChestSchedule implements Runnable {
 				Player p = getRandomPlayer();
 
 				if(p.getLocation().getY() < 63) {
-					if(canFall(p.getLocation().getBlock().getLocation())) {
+					if(pl.canFall(p.getLocation().getBlock().getLocation())) {
 						if(pl.getConfiguration().isCrateMessagesEnabled()) {
 							if(crate.getType() == CrateType.RARE) {
 								Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replace("%p", p.getName()).replace("%crate", crate.getCrateName()));
@@ -79,7 +78,7 @@ public class ChestSchedule implements Runnable {
 						}
 					}
 				} else {
-					if(canFall(p.getLocation().getBlock().getLocation())) {
+					if(pl.canFall(p.getLocation().getBlock().getLocation())) {
 						if(pl.getConfiguration().isCrateMessagesEnabled()) {
 							if(crate.getType() == CrateType.RARE) {
 								Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replace("%p", p.getName()).replace("%crate", crate.getCrateName()));
@@ -91,7 +90,7 @@ public class ChestSchedule implements Runnable {
 				}
 				
 				if(p.getLocation().getY() < 63) {
-					if(canFall(p.getLocation().getBlock().getLocation())) {
+					if(pl.canFall(p.getLocation().getBlock().getLocation())) {
 						if(pl.getConfiguration().isCrateMessagesEnabled()) {
 							if(crate.getType() == CrateType.RARE) {
 								Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
@@ -114,7 +113,7 @@ public class ChestSchedule implements Runnable {
 					}
 				} else {
 					Location highest = p.getWorld().getHighestBlockAt(p.getLocation()).getLocation();
-					if(canFall(highest)) {
+					if(pl.canFall(highest)) {
 						if(pl.getConfiguration().isCrateMessagesEnabled()) {
 							if(crate.getType() == CrateType.RARE) {
 								Bukkit.broadcastMessage(pl.getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getName()).replaceAll("%crate", crate.getCrateName()));
@@ -142,18 +141,6 @@ public class ChestSchedule implements Runnable {
 
 	/**
 	 * @author xize
-	 * @param loc - the location
-	 * @return Boolean
-	 */
-	public boolean canFall(Location loc) {
-		if(!loc.getBlock().getRelative(BlockFace.DOWN).getType().isTransparent() && loc.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * @author xize
 	 * @param returns the player
 	 * @return Player
 	 */
@@ -164,7 +151,7 @@ public class ChestSchedule implements Runnable {
 		}
 		Collections.shuffle(players);
 		for(Player p : players) {
-			if(!(pl.getCrateOwners().contains(p.getName()) || p.hasPermission("manco.bypass") || (pl.getHooks().isWorldGuardEnabled() ? pl.getHookManager().getWorldguardHook().isInRegion(p) : false))) {
+			if(pl.getCrateOwners().contains(p.getName()) || p.hasPermission("manco.bypass")) {
 				return p;
 			}
 		}

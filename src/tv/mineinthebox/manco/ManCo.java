@@ -49,14 +49,21 @@ public class ManCo extends JavaPlugin implements ManCoApi {
 	private final HashMap<String, CratePlayer> players = new HashMap<String, CratePlayer>();
 
 	public void onEnable() {
-		log(LogType.INFO, "has been enabled!");
-
 		config = new Configuration(this);
 		config.createConfiguration();
 
 		handler = new Handler(this);
 		handler.start();
 
+		if(getHooks().isWorldGuardEnabled()) {
+			try {
+				getHookManager().getWorldguardHook().registerFlag(getHookManager().getWorldguardHook().getManCoSpawnFlag());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		scheduler = new ChestSchedule(this);
 
 		getCommand("manco").setExecutor(new MancoCommand(this));
@@ -67,6 +74,10 @@ public class ManCo extends JavaPlugin implements ManCoApi {
 		}
 		
 		loadRecipes();
+		
+		
+		
+		log(LogType.INFO, "has been enabled!");
 	}
 
 	public void onDisable() {
@@ -143,7 +154,7 @@ public class ManCo extends JavaPlugin implements ManCoApi {
 	 * @return Boolean
 	 */
 	public boolean canFall(Location loc) {
-		if(!loc.getBlock().getRelative(BlockFace.DOWN).getType().isTransparent() && loc.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
+		if(!loc.getBlock().getRelative(BlockFace.DOWN).getType().isTransparent() && loc.getBlock().getRelative(BlockFace.DOWN).getType().isSolid() && (getHooks().isWorldGuardEnabled() ? getHookManager().getWorldguardHook().isFlagAllowed(getHookManager().getWorldguardHook().getManCoSpawnFlag(), loc) : false)) {
 			return true;
 		}
 		return false;
@@ -195,7 +206,7 @@ public class ManCo extends JavaPlugin implements ManCoApi {
 	
 	public HookAble getHookManager() {
 		if(!(hookss instanceof HookAble)) {
-			this.hookss = new HookAble();
+			this.hookss = new HookAble(this);
 		}
 		return hookss;
 	}
