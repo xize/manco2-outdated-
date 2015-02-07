@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -154,7 +155,6 @@ public class SchematicBuilder {
 							}catch(NullPointerException e) {e.printStackTrace();}
 						}
 						it.remove();
-						data.remove(block);
 					} else {
 						entity.remove();
 						data.clear();
@@ -189,7 +189,7 @@ public class SchematicBuilder {
 					pl.getHookManager().getNcpHook().exemptBlockPlaceHacks(p);
 				}
 			}
-			Bukkit.getPluginManager().callEvent(new BlockPlaceEvent(block, null, block, p.getItemInHand(), p, true));
+			Bukkit.getPluginManager().callEvent(new BlockPlaceEvent(block, block.getState(), block, (p.getItemInHand() != null ? p.getItemInHand() : new ItemStack(block.getType())), p, true));
 			if(pl.getHooks().isNCPEnabled()) {
 				if(!pl.getHookManager().getNcpHook().isBlockPlaceExempted(p.getName())) {
 					pl.getHookManager().getNcpHook().unExcemptBlockPlaceHacks(p);
