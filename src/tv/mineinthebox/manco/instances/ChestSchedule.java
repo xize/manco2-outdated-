@@ -67,6 +67,10 @@ public class ChestSchedule implements Runnable {
 
 				Player p = getRandomPlayer();
 
+				if(p == null) {
+					return;
+				}
+				
 				if(p.getLocation().getY() < 63) {
 					if(pl.canFall(p.getLocation().getBlock().getLocation())) {
 						if(pl.getConfiguration().isCrateMessagesEnabled()) {
@@ -151,7 +155,7 @@ public class ChestSchedule implements Runnable {
 		}
 		Collections.shuffle(players);
 		for(Player p : players) {
-			if(pl.getCrateOwners().contains(p.getName()) || p.hasPermission("manco.bypass")) {
+			if(!pl.getCrateOwners().contains(p.getName()) && !p.hasPermission("manco.bypass")) {
 				return p;
 			}
 		}
