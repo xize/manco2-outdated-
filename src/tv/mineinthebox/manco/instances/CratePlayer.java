@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import tv.mineinthebox.manco.ManCo;
+import tv.mineinthebox.manco.interfaces.Crate;
 
 public class CratePlayer implements Comparable<String> {
 	
@@ -18,8 +19,9 @@ public class CratePlayer implements Comparable<String> {
 	}
 	
 	/**
+	 * returns the player instance
+	 * 
 	 * @author xize
-	 * @param returns the player instance.
 	 * @return Player
 	 */
 	public Player getPlayer() {
@@ -27,17 +29,26 @@ public class CratePlayer implements Comparable<String> {
 	}
 	
 	/**
+	 * returns true whenever the player has a crate otherwise false
+	 * 
 	 * @author xize
-	 * @param returns true whenever the player has a crate.
 	 * @return Boolean
 	 */
 	public boolean hasCrate() {
 		return (pl.getCrateOwners().contains(p.getName()) && p.hasMetadata("crate"));
 	}
 	
+	public Crate getCrate() {
+		if(hasCrate()) {
+			return pl.getCrate(getCrateChest().getMetadata("crate_serie").get(0).asString());
+		}
+		return null;
+	}
+	
 	/**
+	 * returns the chest
+	 * 
 	 * @author xize
-	 * @param returns the Chest this player owns.
 	 * @return Chest
 	 * @throws NullPointerException - when the chest is not fallen yet or just doesn't exist.
 	 */
@@ -48,6 +59,11 @@ public class CratePlayer implements Comparable<String> {
 		throw new NullPointerException("player has no crate chest.");
 	}
 	
+	/**
+	 * removes all memory allocated objects of the crate the player owns
+	 * 
+	 * @author xize
+	 */
 	public void remove() {
 		if(pl.getCrateOwners().contains(p.getName())) {
 			pl.getCrateOwners().remove(p.getName());
@@ -55,7 +71,12 @@ public class CratePlayer implements Comparable<String> {
 		if(p.hasMetadata("crate")) {
 			Chest chest = getCrateChest();
 			chest.getInventory().clear();
-			chest.removeMetadata("crate", pl);
+			chest.removeMetadata("crate_owner", pl);
+			chest.removeMetadata("crate_serie", pl);
+			if(chest.hasMetadata("crate")) {
+				System.out.println("chest has metadata key \"crate\"");
+			}
+			//chest.removeMetadata("crate", pl);
 			chest.getBlock().setType(Material.AIR);
 			p.removeMetadata("crate", pl);
 		}
