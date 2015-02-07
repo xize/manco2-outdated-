@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
@@ -154,8 +153,16 @@ public class ManCo extends JavaPlugin implements ManCoApi {
 	 * @return Boolean
 	 */
 	public boolean canFall(Location loc) {
-		if(!loc.getBlock().getRelative(BlockFace.DOWN).getType().isTransparent() && loc.getBlock().getRelative(BlockFace.DOWN).getType().isSolid() && (getHooks().isWorldGuardEnabled() ? getHookManager().getWorldguardHook().isFlagAllowed(getHookManager().getWorldguardHook().getManCoSpawnFlag(), loc) : false)) {
-			return true;
+		if(loc.getBlock().getType() != Material.STEP && loc.getBlock().getRelative(BlockFace.DOWN).getType() != Material.STEP) {
+			if(!loc.getBlock().getType().isTransparent() && !loc.getBlock().getRelative(BlockFace.DOWN).getType().isTransparent()) {
+				if((getHooks().isWorldGuardEnabled() ? getHookManager().getWorldguardHook().isFlagAllowed(getHookManager().getWorldguardHook().getManCoSpawnFlag(), loc) : true)) {
+					return true;
+				}
+			} else if(loc.getBlock().getType() == Material.AIR || loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
+				if((getHooks().isWorldGuardEnabled() ? getHookManager().getWorldguardHook().isFlagAllowed(getHookManager().getWorldguardHook().getManCoSpawnFlag(), loc) : true)) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -165,16 +172,8 @@ public class ManCo extends JavaPlugin implements ManCoApi {
 	 * @param cleans up every chest or fallingblock, and every memory related object.
 	 */
 	private void cleanup() {
-		for(Player p : ManCo.getOnlinePlayers()) {
-			if(getCrateOwners().contains(p.getPlayer().getName())) {
-				getCrateOwners().remove(p.getPlayer().getName());
-			}
-			if(p.getPlayer().hasMetadata("crate")) {
-				Chest chest = (Chest) ((FixedMetadataValue)p.getPlayer().getMetadata("crate").get(0)).value();
-				chest.getInventory().clear();
-				chest.getBlock().setType(Material.AIR);
-				p.removeMetadata("crate", this);
-			}
+		for(CratePlayer player : getCratePlayers()) {
+			player.remove();
 		}
 	}
 
