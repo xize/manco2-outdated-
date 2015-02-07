@@ -93,12 +93,11 @@ public class MancoCommand implements CommandExecutor {
 						String message = "";
 						if(!crates.isEmpty()) {
 							Iterator<Crate> it = crates.iterator();
-							int i = 0;
 							for(Crate crate = (it.hasNext() ? it.next() : null); it.hasNext(); crate = it.next()) {
 								if(crate.getType() == CrateType.NORMAL) {
 									NormalCrate nCrate = (NormalCrate) crate;
-									if(nCrate.needsKey()) {
-										if(i == crates.size()) {
+									if(nCrate.needsKey() && crate.isEnabled()) {
+										if(!it.hasNext()) {
 											message += ChatColor.DARK_GRAY + "[NormalCrate]" + ChatColor.GRAY + nCrate.getCrateName() + "(" + nCrate.getKeyPrice() + "$)";
 										} else {
 											message += ChatColor.DARK_GRAY + "[NormalCrate]" + ChatColor.GRAY + nCrate.getCrateName() + "(" + nCrate.getKeyPrice() + "$), ";
@@ -106,15 +105,14 @@ public class MancoCommand implements CommandExecutor {
 									}
 								} else if(crate.getType() == CrateType.RARE) {
 									RareCrate rCrate = new RareCrate(crate.getCrateName(), pl);
-									if(rCrate.needsKey()) {
-										if(i == crates.size()) {
+									if(rCrate.needsKey() && crate.isEnabled()) {
+										if(!it.hasNext()) {
 											message += ChatColor.DARK_PURPLE + "[RareCrate]" + ChatColor.GRAY + rCrate.getCrateName() + "(" + rCrate.getKeyPrice() + "$)";
 										} else {
 											message += ChatColor.DARK_PURPLE + "[RareCrate]" + ChatColor.GRAY + rCrate.getCrateName() + "(" + rCrate.getKeyPrice() + "$), ";
 										}
 									}
 								}
-								i++;
 							}
 							sender.sendMessage(ChatColor.GOLD + ".oO___[ManCo supply crate keys]___Oo.");
 							sender.sendMessage(message);
@@ -129,14 +127,12 @@ public class MancoCommand implements CommandExecutor {
 
 							String message = "";
 
-							int i = 0;
 							for(Crate crate = (it.hasNext() ? it.next() : null); it.hasNext(); crate = it.next()) {
-								if(i == (crates.size()-1)) {
-									message += crate.getType().getPrefix()+ChatColor.GRAY+crate.getCrateName();
+								if(!it.hasNext()) {
+									message += (crate.isEnabled() ? ChatColor.GREEN + "[enabled]" : ChatColor.RED + "[disabled]")+crate.getType().getPrefix()+ChatColor.GRAY+crate.getCrateName();
 								} else {
-									message += crate.getType().getPrefix()+ChatColor.GRAY+crate.getCrateName() + ", ";
+									message += (crate.isEnabled() ? ChatColor.GREEN + "[enabled]" : ChatColor.RED + "[disabled]")+crate.getType().getPrefix()+ChatColor.GRAY+crate.getCrateName() + ", ";
 								}
-								i++;
 							}
 
 							sender.sendMessage(ChatColor.GOLD + ".oO___[ManCo crate list]___Oo.");
