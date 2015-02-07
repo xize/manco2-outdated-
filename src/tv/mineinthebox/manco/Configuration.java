@@ -26,19 +26,19 @@ import tv.mineinthebox.manco.instances.RareCrate;
 import tv.mineinthebox.manco.interfaces.Crate;
 
 public class Configuration {
-	
+
 	private final ManCo pl;
 	private File f;
 	private FileConfiguration con;
-	
+
 	public Configuration(ManCo pl) {
 		this.pl = pl;
 	}
-	
+
 	//private final EnumMap<CrateType, HashMap<String, Crate>> crateList = new EnumMap<CrateType, HashMap<String, Crate>>(CrateType.class);
-	
+
 	private final HashMap<String, Crate> crates = new HashMap<String, Crate>();
-	
+
 	/**
 	 * @author xize
 	 * @param creates the configuration, if the configuration already exists we skip this.
@@ -76,12 +76,12 @@ public class Configuration {
 				items.add(item1);
 				items.add(item2);
 				items.add(item3);
-				
+
 				//a reminder for the crate system
 				//the new chest inventory system will work with ItemMeta and enchants
 				//however since its almost impossible to make it good configurable
 				//we decided to mirror fake inventorys which will save and load on inventory open and close.
-				
+
 				con.set("crates.crate.serie51.isEnabled", true);
 				con.set("crates.crate.serie51.isRare", false);
 				con.set("crates.crate.serie51.rareEffects", false);
@@ -90,7 +90,7 @@ public class Configuration {
 				con.set("crates.crate.serie51.keyPrice", 3.0);
 				con.set("crates.crate.serie51.miniumSlotsFilled", 10);
 				con.set("crates.crate.serie51.items", items.toArray());
-				
+
 				ItemStack item4 = new ItemStack(Material.GOLD_SWORD, 1);
 				item2.addUnsafeEnchantment(Enchantment.DAMAGE_UNDEAD, 1);
 				ItemStack item5 = new ItemStack(Material.APPLE, 4);
@@ -100,7 +100,7 @@ public class Configuration {
 				items2.add(item4);
 				items2.add(item5);
 				items2.add(item6);
-				
+
 				con.set("crates.crate.serie61.isEnabled", true);
 				con.set("crates.crate.serie61.isRare", true);
 				con.set("crates.crate.serie61.rareEffects", true);
@@ -109,7 +109,7 @@ public class Configuration {
 				con.set("crates.crate.serie61.keyPrice", 1.0);
 				con.set("crates.crate.serie61.miniumSlotsFilled", 10);
 				con.set("crates.crate.serie61.items", items2.toArray());
-				
+
 				con.save(f);
 			}
 		} catch(Exception e) {
@@ -117,7 +117,7 @@ public class Configuration {
 		}
 		loadCrates();
 	}
-	
+
 	/**
 	 * @author xize
 	 * @param loads all the crates once!
@@ -135,18 +135,16 @@ public class Configuration {
 			} else {
 				crate = new NormalCrate(name, pl);
 			}
-			if(crate.isEnabled()) {
-				if(!crates.containsKey(crate.getCrateName())) {
-					crates.put(crate.getCrateName(), crate);
-				} else {
-					crates.get(crate.getCrateName());
-				}
-				num++;
+			if(!crates.containsKey(crate.getCrateName())) {
+				crates.put(crate.getCrateName(), crate);
+			} else {
+				crates.get(crate.getCrateName());
 			}
+			num++;
 		}
 		ManCo.log(LogType.INFO, "in total " + num + " crates have been registered.");
 	}
-	
+
 	/**
 	 * @author xize
 	 * @param returns the schedule time
@@ -155,7 +153,7 @@ public class Configuration {
 	public int getScheduleTime() {
 		return con.getInt("crate.schedule");
 	}
-	
+
 	/**
 	 * @author xize
 	 * @param returns the integer
@@ -164,31 +162,31 @@ public class Configuration {
 	public int getDropsPerSchedule() {
 		return con.getInt("crate.dropsPerSchedule");
 	}
-	
+
 	public int getRareCrateChance() {
 		return con.getInt("crate.rareCrateChance");
 	}
-	
+
 	public boolean isCrateMessagesEnabled() {
 		return con.getBoolean("crate.messages.enable");
 	}
-	
+
 	public String getNormalCrateDropMessage() {
 		return ChatColor.translateAlternateColorCodes('&', con.getString("crate.messages.normalDropMessage"));
 	}
-	
+
 	public String getRareCrateDropMessage() {
 		return ChatColor.translateAlternateColorCodes('&', con.getString("crate.messages.rareDropMessage"));
 	}
-	
+
 	public boolean isSpawnRandom() {
 		return con.getBoolean("crate.spawnRandom");
 	}
-	
+
 	public boolean hasProtection() {
 		return con.getBoolean("crate.protectChestAgainstOthers");
 	}
-	
+
 	public void reload() {
 		HandlerList.getRegisteredListeners(pl);
 		try {
@@ -204,7 +202,7 @@ public class Configuration {
 		}
 		pl.getHandlers().start();
 	}
-	
+
 	/**
 	 * @author xize
 	 * @param returns a shared FileConfiguration in a abstract way.
@@ -213,7 +211,7 @@ public class Configuration {
 	public FileConfiguration getConfig() {
 		return con;
 	}
-	
+
 	/**
 	 * @author xize
 	 * @param returns the file in a abstract way.
@@ -222,7 +220,7 @@ public class Configuration {
 	public File getFile() {
 		return f;
 	}
-	
+
 	/**
 	 * returns the crate list
 	 * 
@@ -232,7 +230,7 @@ public class Configuration {
 	public HashMap<String, Crate> getCrateList() {
 		return crates;
 	}
-	
+
 	/**
 	 * returns the crate list
 	 * 
