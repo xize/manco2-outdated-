@@ -138,6 +138,7 @@ public class SchematicBuilder {
 						}
 
 						if(block.getType() == Material.AIR) {
+							
 							try {
 								if(!block.getChunk().isLoaded()) {
 									block.getChunk().load();
@@ -189,7 +190,7 @@ public class SchematicBuilder {
 					pl.getHookManager().getNcpHook().exemptBlockPlaceHacks(p);
 				}
 			}
-			Bukkit.getPluginManager().callEvent(new BlockPlaceEvent(block, block.getState(), block, (p.getItemInHand() != null ? p.getItemInHand() : new ItemStack(block.getType())), p, true));
+			Bukkit.getPluginManager().callEvent(new BlockPlaceEvent(block, null, block.getRelative(BlockFace.DOWN), (p.getItemInHand() != null ? p.getItemInHand() : new ItemStack(block.getType())), p, true));
 			if(pl.getHooks().isNCPEnabled()) {
 				if(!pl.getHookManager().getNcpHook().isBlockPlaceExempted(p.getName())) {
 					pl.getHookManager().getNcpHook().unExcemptBlockPlaceHacks(p);
