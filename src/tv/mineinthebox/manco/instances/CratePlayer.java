@@ -1,5 +1,6 @@
 package tv.mineinthebox.manco.instances;
 
+import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -45,6 +46,19 @@ public class CratePlayer implements Comparable<String> {
 			return (Chest)((FixedMetadataValue)p.getMetadata("crate").get(0)).value();
 		}
 		throw new NullPointerException("player has no crate chest.");
+	}
+	
+	public void remove() {
+		if(pl.getCrateOwners().contains(p.getName())) {
+			pl.getCrateOwners().remove(p.getName());
+		}
+		if(p.hasMetadata("crate")) {
+			Chest chest = getCrateChest();
+			chest.getInventory().clear();
+			chest.removeMetadata("crate", pl);
+			chest.getBlock().setType(Material.AIR);
+			p.removeMetadata("crate", pl);
+		}
 	}
 
 	@Override

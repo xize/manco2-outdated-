@@ -126,7 +126,6 @@ public class ManCo extends JavaPlugin implements ManCoApi {
 	 * @deprecated
 	 * @return ManCoApi
 	 */
-	
 	public ManCoApi getApi() {
 		return (ManCoApi) this;
 	}
