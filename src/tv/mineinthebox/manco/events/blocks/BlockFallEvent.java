@@ -40,7 +40,9 @@ public class BlockFallEvent implements Listener {
 				String player = (String)((FixedMetadataValue)fall.getMetadata("crate_owner").get(0)).asString();
 				String serie = (String)((FixedMetadataValue)fall.getMetadata("crate_serie").get(0)).asString();
 				
-				if(!pl.getScheduler().canFall(fall.getLocation())) {
+				if(!pl.canFall(fall.getLocation())) {
+					fall.removeMetadata("crate_owner", pl);
+					fall.removeMetadata("crate_serie", pl);
 					e.setCancelled(true);
 					return;
 				}
