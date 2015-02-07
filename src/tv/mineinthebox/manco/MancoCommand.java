@@ -242,6 +242,12 @@ public class MancoCommand implements CommandExecutor {
 							Player p = (Player) sender;
 							if(sender.hasPermission("manco.isadmin")) {
 								if(pl.isCrate(args[1])) {
+									
+									if(pl.getCratePlayer(p.getName()).hasCrate()) {
+										sender.sendMessage(ChatColor.RED + "this player has already a crate!");
+										return false;
+									}
+									
 									Random rand = new Random();
 									Crate crate = pl.getCrate(args[1]);
 
@@ -310,6 +316,12 @@ public class MancoCommand implements CommandExecutor {
 						if(sender.hasPermission("manco.isadmin")) {
 							Player p = Bukkit.getPlayer(args[1]);
 							if(p instanceof Player) {
+								
+								if(pl.getCratePlayer(p.getName()).hasCrate()) {
+									sender.sendMessage(ChatColor.RED + "this player has already a crate!");
+									return false;
+								}
+								
 								if(pl.isCrate(args[2])) {
 									Random rand = new Random();
 									Crate crate = pl.getCrate(args[2]);
