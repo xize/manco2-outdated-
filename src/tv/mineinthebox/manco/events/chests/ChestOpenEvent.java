@@ -19,8 +19,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import tv.mineinthebox.manco.ManCo;
 import tv.mineinthebox.manco.enums.CrateType;
-import tv.mineinthebox.manco.instances.NormalCrate;
 import tv.mineinthebox.manco.instances.RareCrate;
+import tv.mineinthebox.manco.interfaces.Crate;
 
 public class ChestOpenEvent implements Listener {
 	
@@ -53,7 +53,7 @@ public class ChestOpenEvent implements Listener {
 					e.setCancelled(true);
 					return;
 				}
-				final NormalCrate crate = pl.getCrate(((FixedMetadataValue)chest.getMetadata("crate_serie").get(0)).asString());
+				final Crate crate = pl.getCrate(((FixedMetadataValue)chest.getMetadata("crate_serie").get(0)).asString());
 				
 				
 				if(crate.needsKey()) {
@@ -134,7 +134,7 @@ public class ChestOpenEvent implements Listener {
 						} else {
 							if(i == 10) {
 								if(crate.getType() == CrateType.RARE) {
-									RareCrate rcrate = new RareCrate(crate.getCrateName(), pl);
+									RareCrate rcrate = (RareCrate)crate;
 									if(rcrate.hasEffects()) {
 										Effect effect = rcrate.getEffect();
 										Sound sound = rcrate.getEffectSound();
@@ -159,7 +159,7 @@ public class ChestOpenEvent implements Listener {
 								}
 							} else {
 								if(crate.getType() == CrateType.RARE) {
-									RareCrate rcrate = new RareCrate(crate.getCrateName(), pl);
+									RareCrate rcrate = (RareCrate)crate;
 									if(rcrate.hasEffects()) {
 										p.sendMessage(ChatColor.GOLD + "opening crate in " + i + " seconds");
 										playSound(p, chest, Sound.HORSE_ARMOR);

@@ -15,7 +15,7 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import tv.mineinthebox.manco.instances.CratePlayer;
-import tv.mineinthebox.manco.instances.NormalCrate;
+import tv.mineinthebox.manco.interfaces.Crate;
 
 public class CrateFallEvent extends CrateEvent implements Chest {
 
@@ -23,7 +23,7 @@ public class CrateFallEvent extends CrateEvent implements Chest {
 	private static final HandlerList handlers = new HandlerList();
 	private final CratePlayer p;
 	
-	public CrateFallEvent(CratePlayer p, Chest chest, NormalCrate crate) {
+	public CrateFallEvent(CratePlayer p, Chest chest, Crate crate) {
 		super(crate);
 		this.chest = chest;
 		this.p = p;

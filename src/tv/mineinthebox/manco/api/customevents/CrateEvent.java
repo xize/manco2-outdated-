@@ -3,19 +3,20 @@ package tv.mineinthebox.manco.api.customevents;
 import org.bukkit.event.Event;
 
 import tv.mineinthebox.manco.enums.CrateType;
-import tv.mineinthebox.manco.instances.NormalCrate;
+import tv.mineinthebox.manco.interfaces.Crate;
 
 public abstract class CrateEvent extends Event {
 	
-	private final NormalCrate crate;
+	private final Crate crate;
 	
-	public CrateEvent(NormalCrate crate) {
+	public CrateEvent(Crate crate) {
 		this.crate = crate;
 	}
 	
 	/**
+	 * returns the crate name
+	 * 
 	 * @author xize
-	 * @param returns the crate name.
 	 * @return String
 	 */
 	public String getCrateName() {
@@ -23,8 +24,9 @@ public abstract class CrateEvent extends Event {
 	}
 	
 	/**
+	 * returns the crate type of the crate in this event
+	 * 
 	 * @author xize
-	 * @param returns the crate type
 	 * @return CrateType
 	 */
 	public CrateType getCrateType() {
@@ -32,25 +34,28 @@ public abstract class CrateEvent extends Event {
 	}
 	
 	/**
+	 * returns the crate being associated in this event
+	 * 
 	 * @author xize
-	 * @param returns the crate
 	 * @return Crate
 	 */
-	public NormalCrate getCrate() {
+	public Crate getCrate() {
 		return crate;
 	}
 	
 	/**
+	 * removes the crate from the configuration
+	 * 
 	 * @author xize
-	 * @param removes the crate type.
 	 */
 	public void remove() {
 		crate.remove();
 	}
 	
 	/**
+	 * disables the crate serie associated in this event
+	 * 
 	 * @author xize
-	 * @param disables this type crate.
 	 */
 	public void disable() {
 		crate.setEnabled(false);

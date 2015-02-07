@@ -1,8 +1,8 @@
 package tv.mineinthebox.manco;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -24,6 +24,7 @@ import tv.mineinthebox.manco.enums.CrateType;
 import tv.mineinthebox.manco.instances.NormalCrate;
 import tv.mineinthebox.manco.instances.RareCrate;
 import tv.mineinthebox.manco.instances.Schematic;
+import tv.mineinthebox.manco.interfaces.Crate;
 
 public class MancoCommand implements CommandExecutor {
 	
@@ -55,6 +56,7 @@ public class MancoCommand implements CommandExecutor {
 						sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco spawn <crate> " + ChatColor.WHITE + ": spawn a crate.");
 						sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco spawn <player> <serie> " + ChatColor.WHITE + ": spawns a crate for a specific player");
 						sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco give money <price> <amount> " + ChatColor.WHITE + ": gives money paper");
+						sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco give schematic <name> <amount> " + ChatColor.WHITE + ": gives a schematic egg");
 						sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco reload " + ChatColor.WHITE + ": reloads the plugin");
 					}
 				} else if(args.length == 1) {
@@ -76,6 +78,7 @@ public class MancoCommand implements CommandExecutor {
 							sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco spawn <crate> " + ChatColor.WHITE + ": spawn a crate.");
 							sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco spawn <player> <serie> " + ChatColor.WHITE + ": spawns a crate for a specific player");
 							sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco give money <price> <amount> " + ChatColor.WHITE + ": gives money paper");
+							sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco give schematic <name> <amount> " + ChatColor.WHITE + ": gives a schematic egg");
 							sender.sendMessage(ChatColor.RED + "Admin: " + ChatColor.GRAY + "/manco reload " + ChatColor.WHITE + ": reloads the plugin");
 						}
 					} else if(args[0].equalsIgnoreCase("reload")) {
@@ -86,17 +89,12 @@ public class MancoCommand implements CommandExecutor {
 							sender.sendMessage(ChatColor.RED + "you cannot do that.");
 						}
 					} else if(args[0].equalsIgnoreCase("list")) {
-						List<NormalCrate> crates = new ArrayList<NormalCrate>();
-						if(pl.getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
-							crates.addAll(pl.getConfiguration().crateList.get(CrateType.NORMAL).values());
-						}
-						if(pl.getConfiguration().crateList.containsKey(CrateType.RARE)) {
-							crates.addAll(pl.getConfiguration().crateList.get(CrateType.RARE).values());
-						}
+						Collection<Crate> crates = pl.getConfiguration().getCrateList().values();
 						String message = "";
 						if(!crates.isEmpty()) {
-							for(int i = 0; i < crates.size(); i++) {
-								NormalCrate crate = crates.get(i);
+							Iterator<Crate> it = crates.iterator();
+							int i = 0;
+							for(Crate crate = (it.hasNext() ? it.next() : null); it.hasNext(); crate = it.next()) {
 								if(crate.getType() == CrateType.NORMAL) {
 									NormalCrate nCrate = (NormalCrate) crate;
 									if(nCrate.needsKey()) {
@@ -116,6 +114,7 @@ public class MancoCommand implements CommandExecutor {
 										}
 									}
 								}
+								i++;
 							}
 							sender.sendMessage(ChatColor.GOLD + ".oO___[ManCo supply crate keys]___Oo.");
 							sender.sendMessage(message);
@@ -125,23 +124,19 @@ public class MancoCommand implements CommandExecutor {
 						}
 					}  else if(args[0].equalsIgnoreCase("crates")) {
 						if(sender.hasPermission("manco.isadmin")) {
-							List<NormalCrate> crates = new ArrayList<NormalCrate>();
-							if(pl.getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
-								crates.addAll(pl.getConfiguration().crateList.get(CrateType.NORMAL).values());
-							}
-							if(pl.getConfiguration().crateList.containsKey(CrateType.RARE)) {
-								crates.addAll(pl.getConfiguration().crateList.get(CrateType.RARE).values());
-							}
+							Collection<Crate> crates = pl.getConfiguration().getCrateList().values();
+							Iterator<Crate> it = crates.iterator();
 
 							String message = "";
 
-							for(int i = 0; i < crates.size(); i++) {
-								NormalCrate crate = crates.get(i);
+							int i = 0;
+							for(Crate crate = (it.hasNext() ? it.next() : null); it.hasNext(); crate = it.next()) {
 								if(i == (crates.size()-1)) {
 									message += crate.getType().getPrefix()+ChatColor.GRAY+crate.getCrateName();
 								} else {
 									message += crate.getType().getPrefix()+ChatColor.GRAY+crate.getCrateName() + ", ";
 								}
+								i++;
 							}
 
 							sender.sendMessage(ChatColor.GOLD + ".oO___[ManCo crate list]___Oo.");
@@ -152,7 +147,7 @@ public class MancoCommand implements CommandExecutor {
 					if(args[0].equalsIgnoreCase("buy")) {
 						if(sender instanceof Player) {
 							if(pl.isCrate(args[1])) {
-								NormalCrate crate = pl.getCrate(args[1]);
+								Crate crate = pl.getCrate(args[1]);
 								if(pl.getHooks().isVaultEnabled()) {
 									if(pl.getHookManager().getVaultHook().hasEnough(sender.getName(), crate.getKeyPrice())) {
 										Player p = (Player) sender;
@@ -196,7 +191,7 @@ public class MancoCommand implements CommandExecutor {
 							if(sender instanceof Player) {
 								if(pl.isCrate(args[1])) {
 									Player p = (Player) sender;
-									NormalCrate crate = pl.getCrate(args[1]);
+									Crate crate = pl.getCrate(args[1]);
 									Inventory inv = Bukkit.createInventory(null, InventoryType.CHEST.getDefaultSize(), "me:"+args[1].toLowerCase());
 									inv.setContents(crate.getRandomItems().toArray(new ItemStack[crate.getRandomItems().size()]));
 									sender.sendMessage(ChatColor.GREEN + "opening crate editor for player " + sender.getName());
@@ -213,7 +208,7 @@ public class MancoCommand implements CommandExecutor {
 					} else if(args[0].equalsIgnoreCase("delete")) {
 						if(sender.hasPermission("manco.isadmin")) {
 							if(pl.isCrate(args[1])) {
-								NormalCrate crate = pl.getCrate(args[1]);
+								Crate crate = pl.getCrate(args[1]);
 								crate.remove();
 								sender.sendMessage(ChatColor.GREEN + "you have successfully removed this crate.");
 							} else {
@@ -225,7 +220,7 @@ public class MancoCommand implements CommandExecutor {
 					} else if(args[0].equalsIgnoreCase("disable")) {
 						if(sender.hasPermission("manco.isadmin")) {
 							if(pl.isCrate(args[1])) {
-								NormalCrate crate = pl.getCrate(args[1]);
+								Crate crate = pl.getCrate(args[1]);
 								crate.setEnabled(false);
 								pl.getConfiguration().reload();
 							} else {
@@ -237,7 +232,7 @@ public class MancoCommand implements CommandExecutor {
 					} else if(args[0].equalsIgnoreCase("enable")) {
 						if(sender.hasPermission("manco.isadmin")) {
 							if(pl.isCrate(args[1])) {
-								NormalCrate crate = pl.getCrate(args[1]);
+								Crate crate = pl.getCrate(args[1]);
 								crate.setEnabled(true);
 								pl.getConfiguration().reload();
 							} else {
@@ -252,7 +247,7 @@ public class MancoCommand implements CommandExecutor {
 							if(sender.hasPermission("manco.isadmin")) {
 								if(pl.isCrate(args[1])) {
 									Random rand = new Random();
-									NormalCrate crate = pl.getCrate(args[1]);
+									Crate crate = pl.getCrate(args[1]);
 
 									if(p.getLocation().getY() < 63) {
 										if(pl.canFall(p.getLocation().getBlock().getLocation())) {
@@ -312,7 +307,7 @@ public class MancoCommand implements CommandExecutor {
 							}
 						}
 					} else {
-						sender.sendMessage(ChatColor.RED + "you need to be a player for this command.");
+						sender.sendMessage(ChatColor.RED + "unknown argument!");
 					}
 				} else if(args.length == 3) {
 					if(args[0].equalsIgnoreCase("spawn")) {
@@ -321,7 +316,7 @@ public class MancoCommand implements CommandExecutor {
 							if(p instanceof Player) {
 								if(pl.isCrate(args[2])) {
 									Random rand = new Random();
-									NormalCrate crate = pl.getCrate(args[2]);
+									Crate crate = pl.getCrate(args[2]);
 
 									if(p.getLocation().getY() < 63) {
 										if(pl.canFall(p.getLocation().getBlock().getLocation())) {
@@ -387,7 +382,7 @@ public class MancoCommand implements CommandExecutor {
 					} else if(args[0].equalsIgnoreCase("setType")) {
 						if(sender.hasPermission("manco.isadmin")) {
 							if(pl.isCrate(args[1])) {
-								NormalCrate crate = pl.getCrate(args[1]);
+								Crate crate = pl.getCrate(args[1]);
 								if(args[2].equalsIgnoreCase(CrateType.RARE.name())) {
 									crate.setType(CrateType.RARE);
 									pl.getConfiguration().reload();
@@ -441,7 +436,6 @@ public class MancoCommand implements CommandExecutor {
 								sender.sendMessage(ChatColor.RED + "you don't have permission to do that.");
 							}
 						} else if(args[1].equalsIgnoreCase("schematic")) {
-
 							if(sender.hasPermission("manco.give.schematic")) {
 								if(sender instanceof Player) {
 									Player p = (Player) sender;

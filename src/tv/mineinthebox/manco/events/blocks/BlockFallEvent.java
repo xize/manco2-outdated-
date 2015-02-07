@@ -19,7 +19,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import tv.mineinthebox.manco.ManCo;
 import tv.mineinthebox.manco.api.customevents.CrateFallEvent;
-import tv.mineinthebox.manco.instances.NormalCrate;
+import tv.mineinthebox.manco.interfaces.Crate;
 
 public class BlockFallEvent implements Listener {
 	
@@ -53,8 +53,7 @@ public class BlockFallEvent implements Listener {
 					Chest chest = (Chest) block.getState();
 					chest.setMetadata("crate_owner", new FixedMetadataValue(pl, player));
 					chest.setMetadata("crate_serie", new FixedMetadataValue(pl, serie));
-					
-					NormalCrate ncrate = new NormalCrate(serie, pl);
+					Crate ncrate = pl.getCrateSerie(serie);
 					
 					List<ItemStack> items = new ArrayList<ItemStack>();
 					Iterator<ItemStack> it = ncrate.getRandomItems().iterator();
@@ -71,10 +70,14 @@ public class BlockFallEvent implements Listener {
 					p.setMetadata("crate", new FixedMetadataValue(pl, chest));
 					
 					Bukkit.getPluginManager().callEvent(new CrateFallEvent(pl.getApi().getCratePlayer(player), chest, ncrate));
+					
+					fall.removeMetadata("crate_owner", pl);
+					fall.removeMetadata("crate_serie", pl);
 					e.setCancelled(true);
 				} else {
+					fall.removeMetadata("crate_owner", pl);
+					fall.removeMetadata("crate_serie", pl);
 					e.setCancelled(true);
-					return;
 				}
 			}
 		}

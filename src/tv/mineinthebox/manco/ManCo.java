@@ -1,5 +1,7 @@
 package tv.mineinthebox.manco;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -7,12 +9,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -20,7 +25,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import tv.mineinthebox.manco.api.ManCoApi;
 import tv.mineinthebox.manco.enums.CrateType;
 import tv.mineinthebox.manco.enums.LogType;
 import tv.mineinthebox.manco.events.Handler;
@@ -28,15 +32,15 @@ import tv.mineinthebox.manco.hooks.Hook;
 import tv.mineinthebox.manco.hooks.HookAble;
 import tv.mineinthebox.manco.instances.ChestSchedule;
 import tv.mineinthebox.manco.instances.CratePlayer;
-import tv.mineinthebox.manco.instances.NormalCrate;
+import tv.mineinthebox.manco.interfaces.Crate;
+import tv.mineinthebox.manco.interfaces.ManCoApi;
 import tv.mineinthebox.manco.utils.SchematicUtils;
 
-public class ManCo extends JavaPlugin {
+public class ManCo extends JavaPlugin implements ManCoApi {
 
 	private Configuration config;
 	private ChestSchedule scheduler;
 	private Handler handler;
-	private ManCoApi api;
 	private HashSet<String> crateOwners;
 	private Hook hooks;
 	private HookAble hookss;
@@ -56,8 +60,6 @@ public class ManCo extends JavaPlugin {
 		scheduler = new ChestSchedule(this);
 
 		getCommand("manco").setExecutor(new MancoCommand(this));
-		
-		this.api = new ManCoApi(this);
 		
 		for(Player p : ManCo.getOnlinePlayers()) {
 			CratePlayer crate = new CratePlayer(p, this);
@@ -116,43 +118,22 @@ public class ManCo extends JavaPlugin {
 		return handler;
 	}
 
-	public ManCoApi getApi() {
-		return api;
-	}
-
 	/**
+	 * returns the ManCo api, deprecated because you should now cast it like:
+	 * ManCoApi api = (ManCoApi)Bukkit.getPluginManager().getPlugin("ManCo");
+	 * 
 	 * @author xize
-	 * @param name - the possible crate name
-	 * @return Boolean
+	 * @deprecated
+	 * @return ManCoApi
 	 */
-	public boolean isCrate(String name) {
-		List<NormalCrate> crates = new ArrayList<NormalCrate>();
-		if(getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
-			crates.addAll(getConfiguration().crateList.get(CrateType.NORMAL).values());
-		}
-		if(getConfiguration().crateList.containsKey(CrateType.RARE)) {
-			crates.addAll(getConfiguration().crateList.get(CrateType.RARE).values());
-		}
-		for(NormalCrate crate : crates) {
-			if(crate.getCrateName().equalsIgnoreCase(name.toLowerCase())) {
-				return true;
-			}
-		}
-		return false;
+	
+	public ManCoApi getApi() {
+		return (ManCoApi) this;
 	}
 
-	public NormalCrate getCrate(String name) {
-		List<NormalCrate> crates = new ArrayList<NormalCrate>();
-		if(getConfiguration().crateList.containsKey(CrateType.NORMAL)) {
-			crates.addAll(getConfiguration().crateList.get(CrateType.NORMAL).values());
-		}
-		if(getConfiguration().crateList.containsKey(CrateType.RARE)) {
-			crates.addAll(getConfiguration().crateList.get(CrateType.RARE).values());
-		}
-		for(NormalCrate crate : crates) {
-			if(crate.getCrateName().equalsIgnoreCase(name.toLowerCase())) {
-				return crate;
-			}
+	public Crate getCrate(String name) {
+		if(getConfiguration().getCrateList().containsKey(name)) {
+			return getConfiguration().getCrateList().get(name);
 		}
 		throw new NullPointerException("crate does not exist");
 	}
@@ -190,39 +171,9 @@ public class ManCo extends JavaPlugin {
 	public void addPlayer(CratePlayer p) {
 		players.put(p.getPlayer().getName().toLowerCase(), p);
 	}
-	
-	public NormalCrate[] getCrates() {
-		int fullSize =  ((getConfiguration().crateList.containsKey(CrateType.NORMAL) ? getConfiguration().crateList.get(CrateType.NORMAL).size() : 0) + (getConfiguration().crateList.containsKey(CrateType.RARE) ? getConfiguration().crateList.get(CrateType.RARE).size() : 0));
-		NormalCrate[] crates = new NormalCrate[fullSize];
-		//List<NormalCrate> crates = new ArrayList<NormalCrate>();
-		int i = 0;
-		for(CrateType type : CrateType.values()) {
-			if(getConfiguration().crateList.containsKey(type)) {
-				for(NormalCrate crate : getConfiguration().crateList.get(type).values()) {
-					crates[i] = crate;
-					i++;
-				}
-			}
-		}
-		return crates;
-	}
 
 	public void removePlayer(CratePlayer p) {
 		players.remove(p.getPlayer().getName().toLowerCase());
-	}
-
-	public CratePlayer getCratePlayer(String name) {
-		return players.get(name.toLowerCase());
-	}
-
-	public CratePlayer[] getCratePlayers() {
-		CratePlayer[] playerss = new CratePlayer[players.size()];
-		int i = 0;
-		for(CratePlayer cratep : players.values()) {
-			playerss[i] = cratep;
-			i++;
-		}
-		return playerss;
 	}
 
 	public boolean containsPlayer(String name) {
@@ -309,4 +260,248 @@ public class ManCo extends JavaPlugin {
 		}
 		throw new NullPointerException("a fatal error has been occuried, please restart your server.");
 	}
+	
+	//api start
+	
+	@Override
+	public CratePlayer getCratePlayer(String name) throws NullPointerException {
+		if(players.containsKey(name.toLowerCase())) {
+			return players.get(name.toLowerCase());
+		}
+		throw new NullPointerException("player does not exist.");
+	}
+
+	@Override
+	public CratePlayer[] getCratePlayers() {
+		CratePlayer[] playerss = new CratePlayer[players.size()];
+		int i = 0;
+		for(CratePlayer cratep : players.values()) {
+			playerss[i] = cratep;
+			i++;
+		}
+		return playerss;
+	}
+
+	@Override
+	public Crate getCrateSerie(String name) throws NullPointerException {
+		return getCrate(name);
+	}
+
+	@Override
+	public void removeCrateSerie(String name) throws NullPointerException {
+		Crate crate = getCrateSerie(name);
+		crate.remove();
+	}
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public Crate spawnCrate(CratePlayer p, Crate crate) {
+		if(p.hasCrate()) {
+			return crate;
+		}
+		Random rand = new Random();
+		if(p.getPlayer().getLocation().getY() < 63) {
+			if(canFall(p.getPlayer().getLocation().getBlock().getLocation())) {
+				if(getConfiguration().isCrateMessagesEnabled()) {
+					if(crate.getType() == CrateType.RARE) {
+						Bukkit.broadcastMessage(getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getPlayer().getName()).replaceAll("%crate", crate.getCrateName()));
+					} else if(crate.getType() == CrateType.NORMAL) {
+						Bukkit.broadcastMessage(getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getPlayer().getName()).replaceAll("%crate", crate.getCrateName()));
+					}
+				}
+
+				if(getConfiguration().isSpawnRandom()) {
+					FallingBlock fall = p.getPlayer().getWorld().spawnFallingBlock(p.getPlayer().getWorld().getHighestBlockAt(p.getPlayer().getLocation()).getLocation().add(rand.nextInt(10), 30, rand.nextInt(10)), Material.CHEST, (byte)0);
+					fall.setMetadata("crate_serie", new FixedMetadataValue(this, crate.getCrateName()));
+					fall.setMetadata("crate_owner", new FixedMetadataValue(this, p.getPlayer().getName()));
+					getCrateOwners().add(p.getPlayer().getName());
+				} else {
+					FallingBlock fall = p.getPlayer().getWorld().spawnFallingBlock(p.getPlayer().getLocation().add(0, 1, 0), Material.CHEST, (byte)0);
+					fall.setMetadata("crate_serie", new FixedMetadataValue(this, crate.getCrateName()));
+					fall.setMetadata("crate_owner", new FixedMetadataValue(this, p.getPlayer().getName()));
+					getCrateOwners().add(p.getPlayer().getName());
+				}
+				return crate;
+			}
+		} else {
+			Location highest = p.getPlayer().getWorld().getHighestBlockAt(p.getPlayer().getLocation()).getLocation();
+			if(canFall(highest)) {
+				if(getConfiguration().isCrateMessagesEnabled()) {
+					if(crate.getType() == CrateType.RARE) {
+						Bukkit.broadcastMessage(getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getPlayer().getName()).replaceAll("%crate", crate.getCrateName()));
+					} else if(crate.getType() == CrateType.NORMAL) {
+						Bukkit.broadcastMessage(getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getPlayer().getName()).replaceAll("%crate", crate.getCrateName()));
+					}
+				}
+
+				if(getConfiguration().isSpawnRandom()) {
+					FallingBlock fall = p.getPlayer().getWorld().spawnFallingBlock(highest.add(rand.nextInt(10), 30, rand.nextInt(10)), Material.CHEST, (byte)0);
+					fall.setMetadata("crate_serie", new FixedMetadataValue(this, crate.getCrateName()));
+					fall.setMetadata("crate_owner", new FixedMetadataValue(this, p.getPlayer().getName()));
+					getCrateOwners().add(p.getPlayer().getName());
+				} else {
+					FallingBlock fall = p.getPlayer().getWorld().spawnFallingBlock(highest.add(0, 30, 0), Material.CHEST, (byte)0);
+					fall.setMetadata("crate_serie", new FixedMetadataValue(this, crate.getCrateName()));
+					fall.setMetadata("crate_owner", new FixedMetadataValue(this, p.getPlayer().getName()));
+					getCrateOwners().add(p.getPlayer().getName());	
+				}
+				return crate;
+			}
+		}
+		return crate;
+	}
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public Crate spawnCrate(CratePlayer p, Crate crate, Location loc) {
+		if(p.hasCrate()) {
+			return crate;
+		}
+		if(canFall(loc)) {
+			if(getConfiguration().isCrateMessagesEnabled()) {
+				if(crate.getType() == CrateType.RARE) {
+					Bukkit.broadcastMessage(getConfiguration().getRareCrateDropMessage().replaceAll("%p", p.getPlayer().getName()).replaceAll("%crate", crate.getCrateName()));
+				} else if(crate.getType() == CrateType.NORMAL) {
+					Bukkit.broadcastMessage(getConfiguration().getNormalCrateDropMessage().replaceAll("%p", p.getPlayer().getName()).replaceAll("%crate", crate.getCrateName()));
+				}
+			}
+
+				FallingBlock fall = p.getPlayer().getWorld().spawnFallingBlock(loc.add(0, 1, 0), Material.CHEST, (byte)0);
+				fall.setMetadata("crate_serie", new FixedMetadataValue(this, crate.getCrateName()));
+				fall.setMetadata("crate_owner", new FixedMetadataValue(this, p.getPlayer().getName()));
+				getCrateOwners().add(p.getPlayer().getName());
+		}
+		return crate;
+	}
+
+	@Override
+	public Crate addCrateSerie(String serie, CrateType type, ItemStack[] items) {
+		File f = new File(getDataFolder() + File.separator + "config.yml");
+		YamlConfiguration con = YamlConfiguration.loadConfiguration(f);
+		con.set("crates.crate."+serie.toLowerCase()+".isEnabled", true);
+		con.set("crates.crate."+serie.toLowerCase()+".isRare", (type == CrateType.RARE));
+		con.set("crates.crate."+serie.toLowerCase()+".rareEffects", false);
+		con.set("crates.crate."+serie.toLowerCase()+".keyEnable", false);
+		con.set("crates.crate."+serie.toLowerCase()+".keyItem", Material.BLAZE_ROD.name());
+		con.set("crates.crate."+serie.toLowerCase()+".keyPrice", 0.0);
+		con.set("crates.crate."+serie.toLowerCase()+".miniumSlotsFilled", 10);
+		con.set("crates.crate."+serie.toLowerCase()+".items", getCleanItems(items));
+		try {
+			con.save(f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		getConfiguration().reload();
+		return getCrateSerie(serie);
+	}
+
+	@Override
+	public Crate addCrateSerie(String serie, CrateType type, ItemStack[] items, boolean enable) {
+		File f = new File(getDataFolder() + File.separator + "config.yml");
+		YamlConfiguration con = YamlConfiguration.loadConfiguration(f);
+		con.set("crates.crate."+serie.toLowerCase()+".isEnabled", enable);
+		con.set("crates.crate."+serie.toLowerCase()+".isRare", (type == CrateType.RARE));
+		con.set("crates.crate."+serie.toLowerCase()+".rareEffects", false);
+		con.set("crates.crate."+serie.toLowerCase()+".keyEnable", false);
+		con.set("crates.crate."+serie.toLowerCase()+".keyItem", Material.BLAZE_ROD.name());
+		con.set("crates.crate."+serie.toLowerCase()+".keyPrice", 0.0);
+		con.set("crates.crate."+serie.toLowerCase()+".miniumSlotsFilled", 10);
+		con.set("crates.crate."+serie.toLowerCase()+".items", getCleanItems(items));
+		try {
+			con.save(f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		getConfiguration().reload();
+		return getCrateSerie(serie);
+	}
+
+	@Override
+	public Crate addCrateSerie(String serie, CrateType type, ItemStack[] items, boolean enable, boolean isRareEffects) {
+		File f = new File(getDataFolder() + File.separator + "config.yml");
+		YamlConfiguration con = YamlConfiguration.loadConfiguration(f);
+		con.set("crates.crate."+serie.toLowerCase()+".isEnabled", true);
+		con.set("crates.crate."+serie.toLowerCase()+".isRare", (type == CrateType.RARE));
+		con.set("crates.crate."+serie.toLowerCase()+".rareEffects", isRareEffects);
+		con.set("crates.crate."+serie.toLowerCase()+".keyEnable", false);
+		con.set("crates.crate."+serie.toLowerCase()+".keyItem", Material.BLAZE_ROD.name());
+		con.set("crates.crate."+serie.toLowerCase()+".keyPrice", 0.0);
+		con.set("crates.crate."+serie.toLowerCase()+".miniumSlotsFilled", 10);
+		con.set("crates.crate."+serie.toLowerCase()+".items", getCleanItems(items));
+		try {
+			con.save(f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		getConfiguration().reload();
+		return getCrateSerie(serie);
+	}
+
+	@Override
+	public Crate addCrateSerie(String serie, CrateType type, ItemStack[] items, boolean enable, boolean isRareEffects, boolean keyEnable, Material key, Double price) {
+		File f = new File(getDataFolder() + File.separator + "config.yml");
+		YamlConfiguration con = YamlConfiguration.loadConfiguration(f);
+		con.set("crates.crate."+serie.toLowerCase()+".isEnabled", true);
+		con.set("crates.crate."+serie.toLowerCase()+".isRare", (type == CrateType.RARE));
+		con.set("crates.crate."+serie.toLowerCase()+".rareEffects", isRareEffects);
+		con.set("crates.crate."+serie.toLowerCase()+".keyEnable", keyEnable);
+		con.set("crates.crate."+serie.toLowerCase()+".keyItem", key);
+		con.set("crates.crate."+serie.toLowerCase()+".keyPrice", price);
+		con.set("crates.crate."+serie.toLowerCase()+".miniumSlotsFilled", 10);
+		con.set("crates.crate."+serie.toLowerCase()+".items", getCleanItems(items));
+		try {
+			con.save(f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		getConfiguration().reload();
+		return getCrateSerie(serie);
+	}
+	
+	@Override
+	public Crate addCrateSerie(String serie, CrateType type, ItemStack[] items, boolean enable, boolean isRareEffects, boolean keyEnable, Material key, Double price, int miniumSlots) {
+		File f = new File(getDataFolder() + File.separator + "config.yml");
+		YamlConfiguration con = YamlConfiguration.loadConfiguration(f);
+		con.set("crates.crate."+serie.toLowerCase()+".isEnabled", true);
+		con.set("crates.crate."+serie.toLowerCase()+".isRare", (type == CrateType.RARE));
+		con.set("crates.crate."+serie.toLowerCase()+".rareEffects", isRareEffects);
+		con.set("crates.crate."+serie.toLowerCase()+".keyEnable", keyEnable);
+		con.set("crates.crate."+serie.toLowerCase()+".keyItem", key);
+		con.set("crates.crate."+serie.toLowerCase()+".keyPrice", price);
+		con.set("crates.crate."+serie.toLowerCase()+".miniumSlotsFilled", miniumSlots);
+		con.set("crates.crate."+serie.toLowerCase()+".items", getCleanItems(items));
+		try {
+			con.save(f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		getConfiguration().reload();
+		return getCrateSerie(serie);
+	}
+	
+	private ItemStack[] getCleanItems(ItemStack[] items) {
+		List<ItemStack> items2 = new ArrayList<ItemStack>();
+		for(ItemStack item : items) {
+			if(item != null) {
+				items2.add(item);
+			}
+		}
+		return items2.toArray(new ItemStack[items2.size()]);
+	}
+	
+	@Override
+	public boolean isCrate(String name) {
+		if(getConfiguration().getCrateList().containsKey(name)) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public Crate[] getCrates() {
+		return getConfiguration().getCrateList().values().toArray(new Crate[getConfiguration().getCrateList().size()]);
+	}
+	
+	//api end
+	
 }

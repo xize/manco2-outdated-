@@ -21,6 +21,7 @@ public class ChestCloseEvent implements Listener {
 		if(e.getInventory().getHolder() instanceof Chest) {
 			Chest chest = (Chest) e.getInventory().getHolder();
 			if(chest.hasMetadata("crate_owner")) {
+				chest.removeMetadata("crate_owner", pl);
 				chest.getBlock().setType(Material.AIR);
 				pl.getCrateOwners().remove(e.getPlayer().getName());
 				e.getPlayer().removeMetadata("crate", pl);

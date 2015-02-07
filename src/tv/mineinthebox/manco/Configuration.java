@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -21,6 +22,8 @@ import org.bukkit.inventory.ItemStack;
 import tv.mineinthebox.manco.enums.CrateType;
 import tv.mineinthebox.manco.enums.LogType;
 import tv.mineinthebox.manco.instances.NormalCrate;
+import tv.mineinthebox.manco.instances.RareCrate;
+import tv.mineinthebox.manco.interfaces.Crate;
 
 public class Configuration {
 	
@@ -30,12 +33,11 @@ public class Configuration {
 	
 	public Configuration(ManCo pl) {
 		this.pl = pl;
-		if(!(this.crateList instanceof EnumMap)) {
-			this.crateList = new EnumMap<CrateType, HashMap<String, NormalCrate>>(CrateType.class);
-		}
 	}
 	
-	public EnumMap<CrateType, HashMap<String, NormalCrate>> crateList;
+	//private final EnumMap<CrateType, HashMap<String, Crate>> crateList = new EnumMap<CrateType, HashMap<String, Crate>>(CrateType.class);
+	
+	private final HashMap<String, Crate> crates = new HashMap<String, Crate>();
 	
 	/**
 	 * @author xize
@@ -123,18 +125,21 @@ public class Configuration {
 	private void loadCrates() {
 		ManCo.log(LogType.INFO, "registering crates...");
 		int num = 0;
-		if(!crateList.isEmpty()) {
-			crateList.clear();
+		if(!crates.isEmpty()) {
+			crates.clear();
 		}
 		for(String name : con.getConfigurationSection("crates.crate").getKeys(false)) {
-			NormalCrate crate = new NormalCrate(name, pl);
+			Crate crate = null;
+			if(con.getBoolean("crates.crate."+name+".isRare")) {
+				crate = new RareCrate(name, pl);
+			} else {
+				crate = new NormalCrate(name, pl);
+			}
 			if(crate.isEnabled()) {
-				if(!crateList.containsKey(crate.getType())) {
-					HashMap<String, NormalCrate> hash = new HashMap<String, NormalCrate>();
-					hash.put(crate.getCrateName(), crate);
-					crateList.put(crate.getType(), hash);
+				if(!crates.containsKey(crate.getCrateName())) {
+					crates.put(crate.getCrateName(), crate);
 				} else {
-					crateList.get(crate.getType()).put(crate.getCrateName(), crate);
+					crates.get(crate.getCrateName());
 				}
 				num++;
 			}
@@ -191,13 +196,10 @@ public class Configuration {
 			loadCrates();
 			pl.getScheduler().restart();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		pl.getHandlers().start();
@@ -219,6 +221,32 @@ public class Configuration {
 	 */
 	public File getFile() {
 		return f;
+	}
+	
+	/**
+	 * returns the crate list
+	 * 
+	 * @author xize
+	 * @return EnumMap<CrateType, HashMap<String, Crate>>()
+	 */
+	public HashMap<String, Crate> getCrateList() {
+		return crates;
+	}
+	
+	/**
+	 * returns the crate list
+	 * 
+	 * @author xize
+	 * @return EnumMap<CrateType, HashMap<String, Crate>>()
+	 */
+	public Crate[] getCrateList(CrateType type) {
+		Collection<Crate> allcrates = getCrateList().values();
+		Iterator<Crate> it = allcrates.iterator();
+		List<Crate> crates = new ArrayList<Crate>();
+		for(Crate crate = (it.hasNext() ? it.next() : null); it.hasNext(); crate = it.next()) {
+			crates.add(crate);
+		}
+		return crates.toArray(new Crate[crates.size()]);
 	}
 
 }

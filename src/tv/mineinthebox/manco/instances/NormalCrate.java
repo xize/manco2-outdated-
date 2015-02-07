@@ -20,8 +20,9 @@ import tv.mineinthebox.manco.ManCo;
 import tv.mineinthebox.manco.enums.CrateType;
 import tv.mineinthebox.manco.enums.LogType;
 import tv.mineinthebox.manco.exceptions.InvalidCrateException;
+import tv.mineinthebox.manco.interfaces.Crate;
 
-public class NormalCrate {
+public class NormalCrate implements Crate {
 
 	private final ManCo pl;
 	private final File f;
@@ -37,17 +38,12 @@ public class NormalCrate {
 			try {
 				throw new InvalidCrateException("crate name is invalid");
 			} catch (InvalidCrateException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 
-	/**
-	 * @author xize
-	 * @param returns the minium slots aquired to be randomized by items.
-	 * @return Integer
-	 */
+	@Override
 	public int getMiniumSlots() {
 		int slots = con.getInt("crates.crate."+ crate +".miniumSlotsFilled");
 		if(!(slots > InventoryType.CHEST.getDefaultSize() || slots < 0)) {
@@ -61,48 +57,28 @@ public class NormalCrate {
 		}
 	}
 
-	/**
-	 * @author xize
-	 * @param returns the crate name
-	 * @return String
-	 */
+	@Override
 	public String getCrateName() {
 		return crate;
 	}
 
-	/**
-	 * @author xize
-	 * @param returns true if the crate is enabled
-	 * @return Boolean
-	 */
+	@Override
 	public boolean isEnabled() {
 		return con.getBoolean("crates.crate."+crate+".isEnabled");
 	}
 
 
-	/**
-	 * @author xize
-	 * @param returns true if the crate needs a special key, else false
-	 * @return Boolean
-	 */
+	@Override
 	public boolean needsKey() {
 		return con.getBoolean("crates.crate."+ getCrateName() +".keyEnable");
 	}
 
-	/**
-	 * @author xize
-	 * @param returns the price of the key
-	 * @return Double
-	 */
+	@Override
 	public double getKeyPrice() {
 		return con.getDouble("crates.crate."+ getCrateName() +".keyPrice");
 	}
 
-	/**
-	 * @author xize
-	 * @param returns a ItemStack which is based to be a key!
-	 * @return ItemStack
-	 */
+	@Override
 	@SuppressWarnings("deprecation")
 	public ItemStack getKeyItem() {
 		try {
@@ -142,27 +118,18 @@ public class NormalCrate {
 		return null;
 	}
 
-	/**
-	 * @author xize
-	 * @param enables or disables the crate type.
-	 * @param bol - when enabled the crate will be used else it will not.
-	 */
+	@Override
 	public void setEnabled(boolean bol) {
 		con.set("crates.crate."+crate+".isEnabled", bol);
 		try {
 			con.save(f);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		reload();
 	}
 
-	/**
-	 * @author xize
-	 * @param returns the crate type, this should be used only for in the super interface
-	 * @return CrateType
-	 */
+	@Override
 	public CrateType getType() {
 		if(con.getBoolean("crates.crate." + crate + ".isRare")) {
 			return CrateType.RARE;
@@ -170,42 +137,29 @@ public class NormalCrate {
 		return CrateType.NORMAL;
 	}
 
-	/**
-	 * @author xize
-	 * @param sets the type of the crate.
-	 * @param type - the CrateType
-	 */
+	@Override
 	public void setType(CrateType type) {
 		con.set("crates.crate."+crate+".isRare", (type == CrateType.RARE ? true : false));
 		try {
 			con.save(f);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		reload();
 	}
 
-	/**
-	 * @author xize
-	 * @param removes the crate
-	 */
+	@Override
 	public void remove() {
 		con.set("crates.crate."+crate, null);
 		try {
 			con.save(f);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		pl.getConfiguration().reload();
 	}
 
-	/**
-	 * @author xize
-	 * @param returns the random items!
-	 * @return ItemStack[]
-	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public List<ItemStack> getRandomItems() {
 		List<ItemStack> stack = Arrays.asList(((List<ItemStack>)con.get("crates.crate."+crate+".items")).toArray(new ItemStack[0]));
@@ -213,10 +167,7 @@ public class NormalCrate {
 		return stack;
 	}
 
-	/**
-	 * @author xize
-	 * @param sets the new random items.
-	 */
+	@Override
 	public void setRandomItems(ItemStack[] items) {
 
 		List<ItemStack> stacks = new ArrayList<ItemStack>();
@@ -231,7 +182,6 @@ public class NormalCrate {
 		try {
 			con.save(f);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		reload();
@@ -250,21 +200,14 @@ public class NormalCrate {
 		return build.toString();
 	}
 
-	/**
-	 * @author xize
-	 * @param updates the crate.
-	 */
 	private void reload() {
 		try {
 			con.load(f);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

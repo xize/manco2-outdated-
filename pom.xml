@@ -3,7 +3,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tv.mineinthebox.manco</groupId>
 	<artifactId>ManCo</artifactId>
-	<version>2.0</version>
 	<build>
 	<sourceDirectory>src</sourceDirectory>
 		<resources>
@@ -131,7 +130,6 @@
 			<groupId>org.jnbt</groupId>
 			<artifactId>jNBT</artifactId>
 			<version>1.2</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>fr.neatmonster</groupId>
@@ -141,4 +139,5 @@
 			<systemPath>${project.basedir}${file.separator}repo${file.separator}nocheatplus-3.10.13-SNAPSHOT.jar</systemPath>
 		</dependency>
 	</dependencies>
+	<version>3.0</version>
 </project>

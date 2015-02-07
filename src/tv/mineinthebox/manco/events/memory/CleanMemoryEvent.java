@@ -3,6 +3,7 @@ package tv.mineinthebox.manco.events.memory;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -18,7 +19,7 @@ public class CleanMemoryEvent implements Listener {
 		this.pl = pl;
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onQuit(PlayerQuitEvent e) {
 		if(pl.getCrateOwners().contains(e.getPlayer().getName())) {
 			pl.getCrateOwners().remove(e.getPlayer().getName());
@@ -31,7 +32,7 @@ public class CleanMemoryEvent implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onQuit(PlayerKickEvent e) {
 		if(pl.getCrateOwners().contains(e.getPlayer().getName())) {
 			pl.getCrateOwners().remove(e.getPlayer().getName());

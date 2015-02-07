@@ -8,7 +8,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 
 import tv.mineinthebox.manco.ManCo;
 import tv.mineinthebox.manco.enums.CrateType;
-import tv.mineinthebox.manco.instances.NormalCrate;
+import tv.mineinthebox.manco.interfaces.Crate;
 
 public class EditorEvent implements Listener {
 	
@@ -29,7 +29,7 @@ public class EditorEvent implements Listener {
 	public void onEdit(InventoryCloseEvent e) {
 		if(e.getInventory().getTitle().startsWith("me:")) {
 			String name = e.getInventory().getTitle().substring("me:".length());
-			NormalCrate crate = pl.getCrate(name);
+			Crate crate = pl.getCrate(name);
 			crate.setRandomItems(e.getInventory().getContents());
 		}
 	}
@@ -38,7 +38,7 @@ public class EditorEvent implements Listener {
 	public void onCreate(InventoryCloseEvent e) {
 		if(e.getInventory().getTitle().startsWith("mc:")) {
 			String name = e.getInventory().getTitle().substring("mc:".length());
-			pl.getApi().addCrateSerie(name, CrateType.NORMAL, e.getInventory().getContents());
+			pl.addCrateSerie(name, CrateType.NORMAL, e.getInventory().getContents());
 		}
 	}
 
